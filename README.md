@@ -1,6 +1,6 @@
 # GAIA — Generative Agile Intelligence Architecture
 
-AI agent framework for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that orchestrates software product development through 26 specialized agents, 56 workflows, and 8 shared skills — from initial research all the way to deployment.
+AI agent framework for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that orchestrates software product development through 25 specialized agents, 56 workflows, and 8 shared skills — from initial research all the way to deployment.
 
 GAIA gives you a team of AI agents with distinct personas, structured workflows that follow a proven product lifecycle, built-in quality gates, checkpoint/resume for long-running sessions, and persistent agent memory across conversations.
 
@@ -136,12 +136,12 @@ _gaia/
 │   └── *-sidecar/        # Per-agent persistent memory (9 sidecars)
 ├── core/                 # Execution engine, protocols, shared tasks
 │   ├── engine/           # workflow.xml, task-runner.xml, error-recovery.xml
-│   ├── tasks/            # 17 standalone review/utility tasks
+│   ├── tasks/            # 16 standalone review/utility tasks
 │   └── workflows/        # Brainstorming, party mode, advanced elicitation
 ├── lifecycle/            # Product lifecycle (5 phases)
 │   ├── agents/           # 11 lifecycle agents
 │   ├── workflows/        # 34 workflows across 5 phases + anytime + quick-flow
-│   ├── templates/        # PRD, architecture, story, sprint plan templates
+│   ├── templates/        # 15 document templates (PRD, architecture, API docs, brownfield, etc.)
 │   └── teams/            # Pre-built team compositions
 ├── dev/                  # Developer tooling
 │   ├── agents/           # 6 stack-specific developers + base
@@ -162,12 +162,12 @@ _gaia/
 | Component | Count |
 |-----------|-------|
 | Modules | 5 (core, lifecycle, dev, creative, testing) |
-| Agents | 26 with distinct personas |
+| Agents | 25 with distinct personas |
 | Workflows | 56 covering the full product lifecycle |
-| Standalone tasks | 17 (reviews, audits, utilities) |
-| Shared skills | 8 with 29 loadable sections |
+| Standalone tasks | 16 (reviews, audits, utilities) |
+| Shared skills | 8 with 47 loadable sections |
 | Slash commands | 99 |
-| Knowledge fragments | 34+ (testing, stack patterns) |
+| Knowledge fragments | 45 (testing, stack patterns) |
 | Agent memory sidecars | 9 |
 | Output artifact dirs | 4 |
 
@@ -332,13 +332,65 @@ Available at any point in the lifecycle.
 
 | Command | Workflow | Description |
 |---------|----------|-------------|
-| `/gaia-brownfield` | Brownfield Onboarding | Apply GAIA to an existing project |
+| `/gaia-brownfield` | Brownfield Onboarding | 9-step knowledge base for existing projects — APIs, UX, events, dependencies, NFRs, architecture, stories |
 | `/gaia-document-project` | Document Project | Document a project for AI context |
 | `/gaia-project-context` | Generate Project Context | Generate context for AI consumption |
 | `/gaia-performance-review` | Performance Review | Analyze performance bottlenecks |
 | `/gaia-brainstorming` | Brainstorming | Facilitated brainstorming session |
 | `/gaia-party` | Party Mode | Multi-agent group discussion |
 | `/gaia-advanced-elicitation` | Advanced Elicitation | Deep requirements elicitation |
+
+### Brownfield Onboarding (Deep Dive)
+
+The brownfield onboarding workflow (`/gaia-brownfield`) is a comprehensive 9-step process that transforms an existing codebase into a fully documented developer knowledge base. It detects project capabilities during scanning and conditionally generates specialized documentation.
+
+**Step 1 — Deep Project Discovery** scans the codebase and sets capability flags:
+
+| Flag | Detection |
+|------|-----------|
+| `{has_apis}` | Route definitions, controllers, OpenAPI/Swagger specs |
+| `{has_events}` | Kafka, RabbitMQ, SNS-SQS, Redis pub-sub, NATS patterns |
+| `{has_external_deps}` | Outbound HTTP clients, SDKs, service URLs |
+| `{has_frontend}` | React, Angular, Vue, Flutter, SwiftUI, CSS frameworks |
+
+**Steps 2–4** are conditional — they only run when the corresponding capability is detected:
+
+| Step | Condition | Output |
+|------|-----------|--------|
+| 2. API Documentation | `{has_apis}` | OpenAPI 3.x spec (discovered or generated), endpoint inventory, Mermaid flow diagram |
+| 3. UX Design Assessment | `{has_frontend}` | UI patterns, Mermaid navigation sitemap, accessibility assessment, UX gaps |
+| 4. Event & Messaging Catalog | `{has_events}` | Producer/consumer tables, delivery guarantees, Mermaid event flow diagrams |
+
+**Steps 5–9** always run:
+
+| Step | Output |
+|------|--------|
+| 5. Dependency Map | External services, infrastructure, library deps with CVE risk, Mermaid dependency graph |
+| 6. NFR Assessment & Baselines | Code quality, security posture, performance, test coverage — all measured, not guessed |
+| 7. Create PRD for Gaps | Gap-focused PRD with NFR baselines from step 6, references all upstream artifacts |
+| 8. Map Architecture with Diagrams | C4 Mermaid diagrams (Level 1 + 2), 3–5 sequence diagrams, as-is/target delta |
+| 9. Epics/Stories & Onboard Developer | Gap stories + developer knowledge base index linking all artifacts |
+
+**Design rules:**
+- All diagrams use **Mermaid syntax** — no ASCII art
+- All API docs use **Swagger/OpenAPI format**
+- Flow diagrams limited to **3–5 key flows** per document
+- NFR baselines are **measured from the codebase**, not estimated
+
+**Output artifacts** (up to 10, depending on detected capabilities):
+
+| Artifact | Always | Conditional |
+|----------|--------|-------------|
+| `project-documentation.md` | Yes | — |
+| `api-documentation.md` | — | `{has_apis}` |
+| `ux-design.md` | — | `{has_frontend}` |
+| `event-catalog.md` | — | `{has_events}` |
+| `dependency-map.md` | Yes | — |
+| `nfr-assessment.md` | Yes | — |
+| `prd.md` | Yes | — |
+| `architecture.md` | Yes | — |
+| `epics-and-stories.md` | Yes | — |
+| `brownfield-onboarding.md` | Yes | — |
 
 ---
 
@@ -440,6 +492,30 @@ docs/
 
 ---
 
+## Templates
+
+Document templates in `_gaia/lifecycle/templates/` provide standardized structures for workflow outputs. Each template has YAML frontmatter (`template`, `version`, `used_by`) and placeholder sections that agents fill during execution.
+
+| Template | Used By | Description |
+|----------|---------|-------------|
+| `prd-template.md` | create-prd | Product requirements document |
+| `architecture-template.md` | create-architecture | Greenfield architecture document |
+| `brownfield-architecture-template.md` | brownfield-onboarding | As-is/target architecture with Mermaid C4 diagrams |
+| `story-template.md` | create-epics-stories | User story with acceptance criteria |
+| `sprint-plan-template.md` | sprint-planning | Sprint plan with capacity and goals |
+| `product-brief-template.md` | create-product-brief | Product brief for stakeholder alignment |
+| `review-template.md` | code-review | Code review report |
+| `test-plan-template.md` | test-design | Test plan with strategy and coverage |
+| `deployment-template.md` | release-plan | Deployment plan and checklist |
+| `api-documentation-template.md` | brownfield-onboarding | OpenAPI/Swagger API documentation |
+| `event-catalog-template.md` | brownfield-onboarding | Event producer/consumer catalog |
+| `dependency-map-template.md` | brownfield-onboarding | Service, infrastructure, and library dependencies |
+| `nfr-assessment-template.md` | brownfield-onboarding | Non-functional requirements baselines |
+| `ux-design-assessment-template.md` | brownfield-onboarding | UI patterns and accessibility assessment |
+| `brownfield-onboarding-template.md` | brownfield-onboarding | Developer knowledge base index |
+
+---
+
 ## Checkpoint & Resume
 
 Long-running workflows save checkpoints to `_gaia/_memory/checkpoints/`. If your session is interrupted or context is lost, run `/gaia-resume` to pick up from the last completed step.
@@ -477,7 +553,7 @@ The single source of truth for project settings at `_gaia/_config/global.yaml`:
 
 ```yaml
 framework_name: "GAIA"
-framework_version: "1.1.0"
+framework_version: "1.1.1"
 
 user_name: "your-name"
 project_name: "your-project"
