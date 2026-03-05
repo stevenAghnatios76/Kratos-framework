@@ -6,7 +6,7 @@ set -euo pipefail
 # Installs, updates, validates, and reports on GAIA installations.
 # ─────────────────────────────────────────────────────────────────────────────
 
-readonly VERSION="1.0.1"
+readonly VERSION="1.0.2"
 readonly GITHUB_REPO="https://github.com/J-louage/Gaia-framework.git"
 readonly MANIFEST_REL="_gaia/_config/manifest.yaml"
 
@@ -347,7 +347,7 @@ GITIGNORE
   info "Next steps:"
   detail "1. cd $TARGET"
   detail "2. Run /gaia-build-configs in the Claude Code terminal to generate resolved configs"
-  detail "3. Run /gaia to start the orchestrator"
+  detail "3. Run /gaia in the Claude Code terminal to start the orchestrator"
   echo ""
 }
 
