@@ -1,0 +1,39 @@
+<workflow name="epic-status">
+<critical>
+  <mandate>Read ONLY frontmatter from story files — never load full story content (token budget protection)</mandate>
+  <mandate>Stories with no .md file are counted as backlog status</mandate>
+  <mandate>Cross-sprint aggregation — do NOT filter by current sprint</mandate>
+</critical>
+<step n="1" title="Load Epics Manifest">
+  <action>Read {planning_artifacts}/epics-and-stories.md</action>
+  <action>Parse all epics: extract epic number, title, goal, done criteria</action>
+  <action>Extract all story keys associated with each epic</action>
+  <action>Build epic-to-stories mapping</action>
+</step>
+<step n="2" title="Scan Story Files">
+  <action>List all .md files in {implementation_artifacts}/</action>
+  <action>For each file, read ONLY the YAML frontmatter (stop at closing ---)</action>
+  <action>Extract: story key, status, sprint_id (if present)</action>
+  <action>Skip non-story files (e.g., sprint-status.yaml, epic-status.md)</action>
+</step>
+<step n="3" title="Aggregate Status">
+  <action>Join scanned story statuses to epic-story mapping from step 1</action>
+  <action>Stories in manifest but with no file: mark as backlog</action>
+  <action>Per epic: count done, in-progress, blocked, review, ready-for-dev, backlog</action>
+  <action>Per epic: compute completion percentage (done / total * 100)</action>
+  <action>Compute overall totals across all epics</action>
+  <action>Collect any story files found that are NOT in any epic (untracked)</action>
+  <action>Mark epics where all stories are done as [COMPLETE]</action>
+</step>
+<step n="4" title="Generate Dashboard">
+  <action>Load template from {project-root}/_gaia/lifecycle/templates/epic-status-template.md</action>
+  <action>Fill summary table with per-epic row: story count, done, in-progress, remaining, completion %</action>
+  <action>Fill per-epic detail sections with ASCII progress bar and story-level status table</action>
+  <action>ASCII progress bar: use filled blocks (█) for done, light blocks (░) for remaining, 20 chars wide</action>
+  <action>Fill untracked stories section</action>
+  <template-output file="{implementation_artifacts}/epic-status.md">
+    Write the completed epic status dashboard using the template.
+    Include all epics, all stories, completion percentages, and progress bars.
+  </template-output>
+</step>
+</workflow>

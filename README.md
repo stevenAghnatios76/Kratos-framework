@@ -1,6 +1,6 @@
 # GAIA — Generative Agile Intelligence Architecture
 
-AI agent framework for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that orchestrates software product development through 25 specialized agents, 56 workflows, and 8 shared skills — from initial research all the way to deployment.
+AI agent framework for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that orchestrates software product development through 25 specialized agents, 57 workflows, and 8 shared skills — from initial research all the way to deployment.
 
 GAIA gives you a team of AI agents with distinct personas, structured workflows that follow a proven product lifecycle, built-in quality gates, checkpoint/resume for long-running sessions, and persistent agent memory across conversations.
 
@@ -49,7 +49,7 @@ The script resolves sources in this order: `--source` flag, `$GAIA_SOURCE` env v
 4. Creates `.resolved/` directories for pre-built configs
 5. Prompts for project name and user name, writes them to `global.yaml`
 6. Copies `CLAUDE.md` to your project root (the framework instruction file)
-7. Installs 99 slash commands to `.claude/commands/`
+7. Installs 100 slash commands to `.claude/commands/`
 8. Appends GAIA entries to `.gitignore`
 
 ### Updating an existing installation
@@ -140,8 +140,8 @@ _gaia/
 │   └── workflows/        # Brainstorming, party mode, advanced elicitation
 ├── lifecycle/            # Product lifecycle (5 phases)
 │   ├── agents/           # 11 lifecycle agents
-│   ├── workflows/        # 34 workflows across 5 phases + anytime + quick-flow
-│   ├── templates/        # 15 document templates (PRD, architecture, API docs, brownfield, etc.)
+│   ├── workflows/        # 35 workflows across 5 phases + anytime + quick-flow
+│   ├── templates/        # 16 document templates (PRD, architecture, API docs, brownfield, etc.)
 │   └── teams/            # Pre-built team compositions
 ├── dev/                  # Developer tooling
 │   ├── agents/           # 6 stack-specific developers + base
@@ -163,10 +163,10 @@ _gaia/
 |-----------|-------|
 | Modules | 5 (core, lifecycle, dev, creative, testing) |
 | Agents | 25 with distinct personas |
-| Workflows | 56 covering the full product lifecycle |
+| Workflows | 57 covering the full product lifecycle |
 | Standalone tasks | 16 (reviews, audits, utilities) |
 | Shared skills | 8 with 47 loadable sections |
-| Slash commands | 99 |
+| Slash commands | 100 |
 | Knowledge fragments | 45 (testing, stack patterns) |
 | Agent memory sidecars | 9 |
 | Output artifact dirs | 4 |
@@ -270,6 +270,7 @@ Workflows are structured multi-step processes. Each has a `workflow.yaml` config
 |---------|----------|-------|--------|
 | `/gaia-sprint-plan` | Sprint Planning | Nate | `docs/implementation-artifacts/` |
 | `/gaia-sprint-status` | Sprint Status | Nate | `docs/implementation-artifacts/` |
+| `/gaia-epic-status` | Epic Status | Nate | `docs/implementation-artifacts/` |
 | `/gaia-create-story` | Create Story | Derek | `docs/implementation-artifacts/` |
 | `/gaia-validate-story` | Validate Story | Derek | `docs/implementation-artifacts/` |
 | `/gaia-dev-story` | Dev Story | Stack dev | `docs/implementation-artifacts/` |
@@ -512,6 +513,7 @@ Document templates in `_gaia/lifecycle/templates/` provide standardized structur
 | `dependency-map-template.md` | brownfield-onboarding | Service, infrastructure, and library dependencies |
 | `nfr-assessment-template.md` | brownfield-onboarding | Non-functional requirements baselines |
 | `ux-design-assessment-template.md` | brownfield-onboarding | UI patterns and accessibility assessment |
+| `epic-status-template.md` | epic-status | Epic completion dashboard with progress bars |
 | `brownfield-onboarding-template.md` | brownfield-onboarding | Developer knowledge base index |
 
 ---
@@ -553,7 +555,7 @@ The single source of truth for project settings at `_gaia/_config/global.yaml`:
 
 ```yaml
 framework_name: "GAIA"
-framework_version: "1.1.5"
+framework_version: "1.1.6"
 
 user_name: "your-name"
 project_name: "your-project"

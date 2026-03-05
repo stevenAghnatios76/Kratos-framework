@@ -1,0 +1,23 @@
+name: epic-status
+description: 'Show epic completion dashboard across all sprints'
+module: lifecycle
+agent: sm
+config_resolved: "{project-root}/_gaia/lifecycle/.resolved/epic-status.yaml"
+config_source: "{project-root}/_gaia/lifecycle/config.yaml"
+installed_path: "{project-root}/_gaia/lifecycle/workflows/4-implementation/epic-status"
+instructions: "{installed_path}/instructions.xml"
+validation: "{installed_path}/checklist.md"
+template: "{project-root}/_gaia/lifecycle/templates/epic-status-template.md"
+input_file_patterns:
+  epics:
+    whole: "{planning_artifacts}/epics-and-stories.md"
+    load_strategy: "FULL_LOAD"
+  stories:
+    pattern: "{implementation_artifacts}/*.md"
+    load_strategy: "FRONTMATTER_ONLY"
+on_error:
+  missing_file: "ask_user"
+  unresolved_variable: "halt"
+
+output:
+  primary: "{implementation_artifacts}/epic-status.md"

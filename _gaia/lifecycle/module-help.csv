@@ -13,6 +13,7 @@ name,code,command,description,agent
 "implementation-readiness","readiness-check","gaia-readiness-check","Validate readiness for implementation","architect"
 "sprint-planning","sprint-plan","gaia-sprint-plan","Plan sprint from epics and stories","sm"
 "sprint-status","sprint-status","gaia-sprint-status","Show current sprint status","sm"
+"epic-status","epic-status","gaia-epic-status","Show epic completion dashboard across all sprints","sm"
 "create-story","create-story","gaia-create-story","Create detailed story file","sm"
 "validate-story","validate-story","gaia-validate-story","Validate story completeness","sm"
 "dev-story","dev-story","gaia-dev-story","Implement a user story","dev-*"
