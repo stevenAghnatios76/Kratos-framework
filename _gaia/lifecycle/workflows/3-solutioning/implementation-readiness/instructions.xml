@@ -28,7 +28,18 @@
   <action>Is authentication/authorization defined in architecture?</action>
   <action>Are data privacy requirements addressed?</action>
 </step>
-<step n="6" title="Generate Gate Report">
+<step n="6" title="Brownfield Completeness Check" optional="true" condition="brownfield-onboarding.md exists in {planning_artifacts}">
+  <action>Skip this step if {planning_artifacts}/brownfield-onboarding.md does not exist. This step only applies to brownfield projects.</action>
+  <action>Verify dependency-map.md exists and has: external services, infrastructure, library dependencies, Mermaid graph</action>
+  <action>Verify nfr-assessment.md exists and has: baseline summary table with real values (not placeholders)</action>
+  <action>If APIs were detected (check project-documentation.md for has_apis flag): verify api-documentation.md exists and has OpenAPI spec and endpoint inventory</action>
+  <action>If events were detected (check project-documentation.md for has_events flag): verify event-catalog.md exists and has produced/consumed event tables</action>
+  <action>If frontend was detected (check project-documentation.md for has_frontend flag): verify ux-design.md exists and has accessibility assessment</action>
+  <action>Verify architecture.md has as-is and target sections with Mermaid diagrams</action>
+  <action>Verify PRD NFR section references nfr-assessment.md baselines (not blank targets)</action>
+  <action>Verify brownfield-onboarding.md links to all generated artifacts</action>
+</step>
+<step n="7" title="Generate Gate Report">
   <template-output file="{planning_artifacts}/readiness-report.md">
     Generate readiness report with YAML frontmatter:
     ---
@@ -40,6 +51,7 @@
       stories_complete: true/false
       tea_ready: true/false
       security_documented: true/false
+      brownfield_complete: true/false/skipped
     blocking_issues:
       - "issue description"
     ---

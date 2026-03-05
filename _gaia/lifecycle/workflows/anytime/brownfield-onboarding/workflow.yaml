@@ -1,5 +1,5 @@
 name: brownfield-onboarding
-description: 'Apply GAIA framework to an existing project'
+description: 'Apply GAIA framework to an existing project with comprehensive developer knowledge base'
 module: lifecycle
 agent: orchestrator
 config_resolved: "{project-root}/_gaia/lifecycle/.resolved/brownfield-onboarding.yaml"
@@ -13,3 +13,14 @@ on_error:
 
 output:
   primary: "{planning_artifacts}/brownfield-onboarding.md"
+  artifacts:
+    - "{planning_artifacts}/project-documentation.md"
+    - "{planning_artifacts}/api-documentation.md"
+    - "{planning_artifacts}/ux-design.md"
+    - "{planning_artifacts}/event-catalog.md"
+    - "{planning_artifacts}/dependency-map.md"
+    - "{planning_artifacts}/nfr-assessment.md"
+    - "{planning_artifacts}/prd.md"
+    - "{planning_artifacts}/architecture.md"
+    - "{planning_artifacts}/epics-and-stories.md"
+    - "{planning_artifacts}/brownfield-onboarding.md"
