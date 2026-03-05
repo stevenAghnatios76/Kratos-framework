@@ -19,4 +19,5 @@ on_error:
   unresolved_variable: "halt"
 
 output:
-  primary: "{implementation_artifacts}/{story_key}.md"
+  primary: "{implementation_artifacts}/{story_number}-{story_key}.md"
+  secondary: "{implementation_artifacts}/sprint-status.yaml"

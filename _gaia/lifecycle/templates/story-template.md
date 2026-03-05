@@ -21,6 +21,19 @@ As a {role}, I want to {action}, so that {benefit}.
 - [ ] Given {context}, when {action}, then {expected result}
 - [ ] Given {context}, when {action}, then {expected result}
 
+## Tasks / Subtasks
+
+- [ ] Task 1 (AC: #)
+  - [ ] Subtask 1.1
+- [ ] Task 2 (AC: #)
+  - [ ] Subtask 2.1
+
+## Dev Notes
+
+- Relevant architecture patterns and constraints
+- Source tree components to touch
+- Testing standards summary
+
 ## Technical Notes
 
 {Implementation guidance, architecture constraints, relevant patterns.}
@@ -35,19 +48,6 @@ As a {role}, I want to {action}, so that {benefit}.
 |----------|-------|----------|
 | {happy path} | {input} | {output} |
 | {edge case} | {input} | {output} |
-
-## Tasks / Subtasks
-
-- [ ] Task 1 (AC: #)
-  - [ ] Subtask 1.1
-- [ ] Task 2 (AC: #)
-  - [ ] Subtask 2.1
-
-## Dev Notes
-
-- Relevant architecture patterns and constraints
-- Source tree components to touch
-- Testing standards summary
 
 ### Project Structure Notes
 

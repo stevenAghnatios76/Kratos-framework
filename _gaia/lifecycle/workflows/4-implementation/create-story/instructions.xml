@@ -23,8 +23,16 @@
   <action>Append DoD checklist: all AC met, tests pass, code reviewed, docs updated</action>
 </step>
 <step n="6" title="Generate Output">
-  <template-output file="{implementation_artifacts}/{story_key}.md">
-    Generate story file with YAML frontmatter (key, title, epic, status: ready-for-dev, sprint, assignee, depends_on) and sections: Acceptance Criteria, Technical Notes, Subtasks, Definition of Done.
+  <template-output file="{implementation_artifacts}/{story_number}-{story_key}.md">
+    Generate story file using story-template.md. The filename must include the story number and story key (e.g., S01-user-login.md). Fill all template sections: User Story, Acceptance Criteria, Tasks/Subtasks (linked to AC numbers), Dev Notes, Technical Notes, Dependencies, Test Scenarios, Project Structure Notes, References, Dev Agent Record, and Estimate.
+  </template-output>
+</step>
+<step n="7" title="Update Sprint Status">
+  <action>Read {implementation_artifacts}/sprint-status.yaml</action>
+  <action>Find the story entry matching {story_key} and update its status to ready-for-dev</action>
+  <action>If sprint-status.yaml does not exist, create it with the story entry set to ready-for-dev</action>
+  <template-output file="{implementation_artifacts}/sprint-status.yaml">
+    Update the sprint status file with the story status set to ready-for-dev.
   </template-output>
 </step>
 </workflow>
