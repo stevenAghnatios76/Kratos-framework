@@ -8,9 +8,17 @@
   <action>Capture: tech stack, architecture, existing features, code quality</action>
 </step>
 <step n="2" title="Create PRD for Gaps">
-  <action>Invoke create-prd in brownfield mode</action>
-  <action>Start from existing features, identify gaps and improvements</action>
-  <action>Focus on what's MISSING, not what EXISTS</action>
+  <action>Read the PRD template from {installed_path}/../../templates/prd-template.md</action>
+  <action>Invoke create-prd logic in brownfield mode: use the PRD template structure but fill every section with gap-focused content only</action>
+  <action>Overview = existing project summary + what gaps this PRD addresses</action>
+  <action>Goals = gap closure goals only. Non-Goals = existing features that will NOT be re-implemented</action>
+  <action>User Stories = stories for gap features only, not existing functionality</action>
+  <action>Functional Requirements = gap requirements organized by priority</action>
+  <action>Non-Functional Requirements = NFR gaps (performance, security, accessibility targets not yet met)</action>
+  <action>Start from existing features identified in step 1, focus on what's MISSING not what EXISTS</action>
+  <template-output file="{planning_artifacts}/prd.md">
+    Generate a PRD following the standard template structure. Add "Mode: Brownfield — gaps only" to the header. All sections must follow the template format but contain only gap-focused content. Include a Priority Matrix section mapping each gap to priority/effort/impact.
+  </template-output>
 </step>
 <step n="3" title="Map Architecture">
   <action>Invoke create-architecture in discovery mode</action>
