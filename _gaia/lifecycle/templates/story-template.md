@@ -75,3 +75,7 @@ As a {role}, I want to {action}, so that {benefit}.
 
 - **Points:** {story points}
 - **Developer:** {assigned agent}
+
+## Definition of Done
+
+- [ ] Define all the Definition of Done
