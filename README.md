@@ -559,7 +559,7 @@ The single source of truth for project settings at `_gaia/_config/global.yaml`:
 
 ```yaml
 framework_name: "GAIA"
-framework_version: "1.1.21"
+framework_version: "1.1.22"
 
 user_name: "your-name"
 project_name: "your-project"

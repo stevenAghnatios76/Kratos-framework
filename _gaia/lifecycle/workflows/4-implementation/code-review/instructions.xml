@@ -2,7 +2,7 @@
 <critical>
   <mandate>Story must be in review status before code review</mandate>
   <mandate>Output must include machine-readable APPROVE or REQUEST_CHANGES</mandate>
-  <mandate>Code review alone does NOT set story to done — the Review Gate protocol handles that</mandate>
+  <mandate>After updating the Review Gate, if all 3 rows are PASSED and story is in 'review', you MUST transition story to 'done'</mandate>
 </critical>
 <step n="1" title="Load Story">
   <action>Read story file, identify files changed</action>
@@ -35,15 +35,18 @@
     Update story file Review Gate table with code review result and report link. If REQUEST_CHANGES, also update story status to in-progress.
   </template-output>
 </step>
-<step n="8" title="Review Gate Check">
-  <action>MANDATORY: Read the Review Gate table you just updated in the story file</action>
-  <action>The table must have EXACTLY 3 rows: Code Review, QA Tests, Security Review. Remove any other rows.</action>
-  <action>Count how many rows show PASSED vs PENDING vs FAILED</action>
-  <action>If ALL 3 rows are PASSED: set story status to 'done' in story file AND in sprint-status.yaml. Log "Review gate PASSED — all reviews complete. Story is done."</action>
-  <action>If any row is FAILED: log which reviews failed. Story stays in current status.</action>
-  <action>If any row is PENDING: log which reviews are still pending. Story stays in current status.</action>
+<step n="8" title="Transition Story If Gate Passed">
+  <critical>
+    <mandate>You MUST execute this step even if the Review Gate was already fully passed before this workflow run. The purpose of this step is to ensure the story status matches the gate state.</mandate>
+  </critical>
+  <action>Re-read the story file now. Check two things: (1) the Review Gate table rows, (2) the current story status.</action>
+  <action>The Review Gate table must have EXACTLY 3 rows: Code Review, QA Tests, Security Review. Remove any other rows.</action>
+  <action>If ALL 3 rows show PASSED AND the story status is still 'review': you MUST change the story status to 'done' in the story file AND in sprint-status.yaml. This is a REQUIRED write operation, not informational.</action>
+  <action>If ALL 3 rows show PASSED AND the story status is already 'done': log "Story already done. No update needed."</action>
+  <action>If any row is FAILED: log which reviews failed. Do not change story status.</action>
+  <action>If any row is PENDING: log which reviews are still pending. Do not change story status.</action>
   <template-output file="{implementation_artifacts}/sprint-status.yaml">
-    If all 3 reviews PASSED: update sprint-status.yaml with story status set to done.
+    Read sprint-status.yaml. If all 3 Review Gate rows are PASSED and the story status is 'review', update the story status to 'done' and save the file.
   </template-output>
 </step>
 </workflow>

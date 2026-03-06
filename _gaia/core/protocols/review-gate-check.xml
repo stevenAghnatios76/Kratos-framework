@@ -12,18 +12,17 @@
   <action>If Review Gate table has extra rows beyond the 3 valid ones: remove the invalid rows</action>
   <action>Parse each row: Review name, Status (PENDING | PASSED | FAILED), Report link</action>
 </step>
-<step n="2" title="Evaluate Gate">
-  <action>Count: total rows, PASSED rows, FAILED rows, PENDING rows</action>
-  <action>If any row is FAILED: log "Review gate not passed — {failed_reviews} failed. Developer must fix and re-submit for review." No status change.</action>
-  <action>If any row is PENDING: log "Review gate incomplete — waiting on: {pending_reviews}." No status change.</action>
-  <action>If ALL rows are PASSED: transition story to done.</action>
-</step>
-<step n="3" title="Transition to Done" condition="all_rows == PASSED">
-  <action>Set story status to 'done' in story file frontmatter</action>
-  <action>Update {implementation_artifacts}/sprint-status.yaml: set story status to 'done'</action>
-  <action>Log: "Review gate PASSED — all reviews complete. Story is done."</action>
+<step n="2" title="Evaluate Gate and Transition">
+  <critical>
+    <mandate>You MUST execute the transition even if the gate was already fully passed before this run. The purpose is to ensure story status matches gate state.</mandate>
+  </critical>
+  <action>Check two things: (1) the Review Gate table rows, (2) the current story status</action>
+  <action>If ALL 3 rows show PASSED AND the story status is still 'review': you MUST change the story status to 'done' in the story file AND in sprint-status.yaml. This is a REQUIRED write operation.</action>
+  <action>If ALL 3 rows show PASSED AND the story status is already 'done': log "Story already done. No update needed."</action>
+  <action>If any row is FAILED: log which reviews failed. Do not change story status.</action>
+  <action>If any row is PENDING: log which reviews are still pending. Do not change story status.</action>
   <template-output file="{implementation_artifacts}/sprint-status.yaml">
-    Update sprint-status.yaml with story status set to done.
+    Read sprint-status.yaml. If all 3 Review Gate rows are PASSED and the story status is 'review', update the story status to 'done' and save the file.
   </template-output>
 </step>
 </protocol>
