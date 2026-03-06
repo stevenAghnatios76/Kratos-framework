@@ -17,25 +17,36 @@
   <action>Each story needs: title, description, acceptance criteria, size estimate (S/M/L/XL)</action>
   <action>Use format: "As a [user], I want to [action] so that [benefit]"</action>
 </step>
-<step n="4" title="Declare Dependencies">
+<step n="4" title="Apply Test-Plan Risk Levels">
+  <action>Read {test_artifacts}/test-plan.md — extract risk assessment: high-risk areas (revenue-critical, security-sensitive, complex logic)</action>
+  <action>For each story: if it touches a high-risk component, set risk_level: high. Otherwise medium or low.</action>
+  <action>High-risk stories: add to Dev Notes: "Risk: HIGH — run /gaia-atdd before /gaia-dev-story"</action>
+</step>
+<step n="5" title="Declare Dependencies">
   <action>For each story, declare depends_on: [story-ids] and blocks: [story-ids]</action>
   <action>Ensure no circular dependencies</action>
 </step>
-<step n="5" title="Priority Ordering">
+<step n="6" title="Priority Ordering">
   <action>Sort stories by: dependency topology first, then business priority</action>
   <action>Assign priority: P0 (must-have), P1 (should-have), P2 (nice-to-have)</action>
 </step>
-<step n="6" title="Generate Output">
+<step n="7" title="Generate Output">
   <template-output file="{planning_artifacts}/epics-and-stories.md">
     Generate epics and stories document. Each story formatted as:
     ### Story {epic-N}-{story-N}: {Title}
     - Epic: {epic name}
     - Priority: {P0/P1/P2}
     - Size: {S/M/L/XL}
+    - Risk: {high/medium/low}
     - Depends on: [{story-ids}]
     - Blocks: [{story-ids}]
     - Acceptance Criteria:
       - AC1: {criteria}
   </template-output>
+</step>
+<step n="8" title="Optional: Adversarial Review">
+  <ask>Would you like to run an adversarial review on the epics and stories? This will challenge story completeness, missing edge cases, dependency gaps, and acceptance criteria quality. Recommended before sprint planning. (yes/no)</ask>
+  <action>If yes: run /gaia-adversarial targeting {planning_artifacts}/epics-and-stories.md</action>
+  <action>If no: skip — adversarial review can be run anytime later with /gaia-adversarial</action>
 </step>
 </workflow>

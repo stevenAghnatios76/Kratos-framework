@@ -316,6 +316,16 @@ Fast-track workflows for small changes that skip the full lifecycle ceremony.
 
 ### Testing Workflows
 
+Testing workflows are **integrated into the main lifecycle** — they are not optional standalone tools. Key integration points:
+
+| Lifecycle Point | Required Testing Workflow | Gate Type |
+|---|---|---|
+| After `/gaia-create-arch` | `/gaia-test-design` | HALT at `/gaia-create-epics` |
+| Before `/gaia-dev-story` (high-risk) | `/gaia-atdd` | HALT (conditional on risk_level) |
+| Before `/gaia-readiness-check` | `/gaia-trace` + `/gaia-ci-setup` | HALT |
+| During `/gaia-brownfield` | `/gaia-nfr` + `/gaia-perf-testing` | REQUIRED steps |
+| Before `/gaia-deploy-checklist` | traceability + CI + readiness PASS | HALT |
+
 | Command | Workflow | Agent | Output |
 |---------|----------|-------|--------|
 | `/gaia-test-design` | Test Design | Sable | `docs/test-artifacts/` |
@@ -366,15 +376,16 @@ The brownfield onboarding workflow (`/gaia-brownfield`) is a comprehensive 9-ste
 | 3. UX Design Assessment | `{has_frontend}` | UI patterns, Mermaid navigation sitemap, accessibility assessment, UX gaps |
 | 4. Event & Messaging Catalog | `{has_events}` | Producer/consumer tables, delivery guarantees, Mermaid event flow diagrams |
 
-**Steps 5–9** always run:
+**Steps 5–10** always run:
 
 | Step | Output |
 |------|--------|
 | 5. Dependency Map | External services, infrastructure, library deps with CVE risk, Mermaid dependency graph |
-| 6. NFR Assessment & Baselines | Code quality, security posture, performance, test coverage — all measured, not guessed |
-| 7. Create PRD for Gaps | Gap-focused PRD with NFR baselines from step 6, references all upstream artifacts |
-| 8. Map Architecture with Diagrams | C4 Mermaid diagrams (Level 1 + 2), 3–5 sequence diagrams, as-is/target delta |
-| 9. Epics/Stories & Onboard Developer | Gap stories + developer knowledge base index linking all artifacts |
+| 6. NFR Assessment & Baselines | Code quality, security posture, performance, test coverage — output to `test-artifacts/nfr-assessment.md` (canonical) |
+| 7. Performance Test Plan | Performance budgets, load test scenarios, Core Web Vitals targets — output to `test-artifacts/` (**REQUIRED**) |
+| 8. Create PRD for Gaps | Gap-focused PRD with NFR baselines from step 6, references all upstream artifacts |
+| 9. Map Architecture with Diagrams | C4 Mermaid diagrams (Level 1 + 2), 3–5 sequence diagrams, as-is/target delta |
+| 10. Epics/Stories & Onboard Developer | Gap stories + developer knowledge base index linking all artifacts |
 
 **Design rules:**
 - All diagrams use **Mermaid syntax** — no ASCII art
@@ -382,20 +393,21 @@ The brownfield onboarding workflow (`/gaia-brownfield`) is a comprehensive 9-ste
 - Flow diagrams limited to **3–5 key flows** per document
 - NFR baselines are **measured from the codebase**, not estimated
 
-**Output artifacts** (up to 10, depending on detected capabilities):
+**Output artifacts** (up to 11, depending on detected capabilities):
 
-| Artifact | Always | Conditional |
-|----------|--------|-------------|
-| `project-documentation.md` | Yes | — |
-| `api-documentation.md` | — | `{has_apis}` |
-| `ux-design.md` | — | `{has_frontend}` |
-| `event-catalog.md` | — | `{has_events}` |
-| `dependency-map.md` | Yes | — |
-| `nfr-assessment.md` | Yes | — |
-| `prd.md` | Yes | — |
-| `architecture.md` | Yes | — |
-| `epics-and-stories.md` | Yes | — |
-| `brownfield-onboarding.md` | Yes | — |
+| Artifact | Location | Always | Conditional |
+|----------|----------|--------|-------------|
+| `project-documentation.md` | `planning-artifacts/` | Yes | — |
+| `api-documentation.md` | `planning-artifacts/` | — | `{has_apis}` |
+| `ux-design.md` | `planning-artifacts/` | — | `{has_frontend}` |
+| `event-catalog.md` | `planning-artifacts/` | — | `{has_events}` |
+| `dependency-map.md` | `planning-artifacts/` | Yes | — |
+| `nfr-assessment.md` | `test-artifacts/` | Yes | — |
+| `performance-test-plan-{date}.md` | `test-artifacts/` | Yes | — |
+| `prd.md` | `planning-artifacts/` | Yes | — |
+| `architecture.md` | `planning-artifacts/` | Yes | — |
+| `epics-and-stories.md` | `planning-artifacts/` | Yes | — |
+| `brownfield-onboarding.md` | `planning-artifacts/` | Yes | — |
 
 ---
 
@@ -414,6 +426,36 @@ Standalone tasks that can be run anytime without a full workflow. These are sing
 | `/gaia-review-deps` | Dependency Audit | Scan dependencies for vulnerabilities |
 | `/gaia-review-a11y` | Accessibility Review | WCAG 2.1 compliance review |
 | `/gaia-review-perf` | Performance Review | Code-level performance review |
+
+### Adversarial Review (`/gaia-adversarial`)
+
+The adversarial review is a cynical, critical examination designed to find flaws, gaps, and weaknesses in any document or design. It deliberately assumes nothing works as claimed and attacks from **10 different perspectives**:
+
+| Perspective | What it challenges |
+|---|---|
+| **Feasibility** | Can this actually be built as described? |
+| **Completeness** | What's missing that should be there? |
+| **Contradictions** | Do any sections contradict each other? |
+| **Assumptions** | What unstated assumptions could be wrong? |
+| **Scale** | Will this work at 10x/100x expected load? |
+| **Failure modes** | What happens when things go wrong? |
+| **Dependencies** | What external factors could break this? |
+| **Security** | What attack surfaces are exposed? |
+| **User impact** | Where will users get confused or frustrated? |
+| **Business risk** | What could make this commercially unviable? |
+
+**Output:** A ranked findings report with severity (critical/high/medium/low), confidence (certain/likely/possible), a threat summary of the top 3 issues, and an overall risk assessment. The review only identifies problems — it does not suggest fixes.
+
+**When to use it:** The adversarial review is integrated as an optional prompt at 4 key lifecycle points:
+
+| Trigger Point | When Prompted | Recommended For |
+|---|---|---|
+| After `/gaia-create-prd` | End of PRD creation (step 11) | Complex or high-stakes products |
+| After `/gaia-create-arch` | End of architecture design (step 9) | Distributed systems, high-scale projects |
+| After `/gaia-create-epics` | End of epic/story creation (step 8) | Before sprint planning |
+| After `/gaia-readiness-check` | End of readiness check (step 9) | Strongly recommended — last chance before build |
+
+At each point you can accept or skip. It can also be run independently anytime with `/gaia-adversarial` on any artifact.
 
 ### Editorial & Documentation
 
@@ -559,7 +601,7 @@ The single source of truth for project settings at `_gaia/_config/global.yaml`:
 
 ```yaml
 framework_name: "GAIA"
-framework_version: "1.1.22"
+framework_version: "1.3.0"
 
 user_name: "your-name"
 project_name: "your-project"
@@ -604,22 +646,26 @@ A full product lifecycle from idea to deployment:
 /gaia-brainstorm           → brainstorm the idea
 /gaia-product-brief        → create a product brief
 /gaia-market-research      → validate market fit
-/gaia-create-prd           → write the PRD
+/gaia-create-prd           → write the PRD (optional: adversarial review)
 /gaia-create-ux            → design the UX
-/gaia-create-arch          → design the architecture
-/gaia-create-epics         → break into epics and stories
-/gaia-readiness-check      → verify everything is ready
-/gaia-sprint-plan          → plan the first sprint
+/gaia-create-arch          → design the architecture (optional: adversarial review)
+/gaia-test-design          → create test plan (REQUIRED before epics)
+/gaia-create-epics         → break into epics and stories (optional: adversarial review)
+/gaia-trace                → generate traceability matrix (REQUIRED before readiness)
+/gaia-ci-setup             → scaffold CI pipeline (REQUIRED before readiness)
+/gaia-readiness-check      → verify everything is ready (optional: adversarial review)
+/gaia-sprint-plan          → plan the first sprint (risk-aware)
 /gaia-create-story         → create detailed stories
 /gaia-validate-story       → validate story completeness
 /gaia-fix-story            → fix issues from validation
-/gaia-dev-story            → implement stories
+/gaia-atdd                 → write acceptance tests (REQUIRED for high-risk stories)
+/gaia-dev-story            → implement stories (gates on ATDD for high-risk)
 /gaia-code-review          → review the code
 /gaia-qa-tests             → generate tests
 /gaia-security-review      → security audit
 /gaia-triage-findings      → triage dev findings into backlog
 /gaia-release-plan         → plan the release
-/gaia-deploy-checklist     → pre-deploy verification
+/gaia-deploy-checklist     → pre-deploy verification (enforced gates)
 /gaia-post-deploy          → post-deploy health check
 /gaia-retro                → sprint retrospective
 ```

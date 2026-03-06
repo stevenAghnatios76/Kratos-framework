@@ -1,4 +1,4 @@
-# GAIA Framework v1.1.22
+# GAIA Framework v1.3.0
 
 This project uses the **GAIA** (Generative Agile Intelligence Architecture) framework — an AI agent framework for Claude Code that orchestrates software product development through 25 specialized agents, 59 workflows, and 8 shared skills.
 
@@ -76,6 +76,13 @@ _gaia/                    # Framework root
 - Pre-start gates must pass before workflow execution begins
 - Post-complete gates must pass before marking a workflow done
 - Never mark a task complete without all tests passing
+
+**Testing integration gates (enforced):**
+- `create-epics-stories` requires `test-plan.md` — run `/gaia-test-design` after architecture
+- `implementation-readiness` requires `traceability-matrix.md` + `ci-setup.md` — run `/gaia-trace` + `/gaia-ci-setup`
+- `dev-story` requires `atdd-{story_key}.md` for high-risk stories — run `/gaia-atdd`
+- `deployment-checklist` requires traceability + CI + readiness report PASS
+- `brownfield-onboarding` requires NFR assessment + performance test plan (output to `test-artifacts/`)
 
 ## Naming Conventions
 

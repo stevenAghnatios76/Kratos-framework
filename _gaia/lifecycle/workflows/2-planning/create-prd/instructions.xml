@@ -47,4 +47,9 @@
     Generate PRD with all sections: overview, user personas, functional requirements (prioritized), non-functional requirements, user journeys, data requirements, integrations, constraints, assumptions, success criteria.
   </template-output>
 </step>
+<step n="11" title="Optional: Adversarial Review">
+  <ask>Would you like to run an adversarial review on the PRD? This will critically examine the document for flaws, gaps, and weaknesses from 10 different perspectives (feasibility, completeness, contradictions, assumptions, scale, failure modes, dependencies, security, user impact, business risk). Recommended for complex or high-stakes products. (yes/no)</ask>
+  <action>If yes: run /gaia-adversarial targeting {planning_artifacts}/prd.md</action>
+  <action>If no: skip — adversarial review can be run anytime later with /gaia-adversarial</action>
+</step>
 </workflow>

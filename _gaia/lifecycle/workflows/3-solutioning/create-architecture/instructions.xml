@@ -44,4 +44,9 @@
     Generate architecture document with: technology stack, system architecture, data architecture, API design, infrastructure plan, and ADR references.
   </template-output>
 </step>
+<step n="9" title="Optional: Adversarial Review">
+  <ask>Would you like to run an adversarial review on the architecture? This will critically challenge technical decisions, scalability assumptions, failure modes, security surfaces, and dependency risks. Recommended for distributed systems or high-scale projects. (yes/no)</ask>
+  <action>If yes: run /gaia-adversarial targeting {planning_artifacts}/architecture.md</action>
+  <action>If no: skip — adversarial review can be run anytime later with /gaia-adversarial</action>
+</step>
 </workflow>

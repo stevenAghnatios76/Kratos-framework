@@ -5,6 +5,9 @@
 </critical>
 <step n="1" title="Load All Artifacts">
   <action>Load PRD, UX Design, Architecture, Epics/Stories</action>
+  <action>Load {test_artifacts}/traceability-matrix.md — extract requirement coverage summary</action>
+  <action>Load {test_artifacts}/ci-setup.md — extract pipeline quality gates summary</action>
+  <action>Load {test_artifacts}/test-plan.md if exists — extract risk assessment</action>
   <action>Note any missing artifacts immediately</action>
 </step>
 <step n="2" title="Completeness Check">
@@ -23,15 +26,21 @@
   <action>Are acceptance criteria testable and automatable?</action>
   <action>Are NFR targets quantified for performance testing?</action>
 </step>
-<step n="5" title="Security Readiness">
+<step n="5" title="Test Infrastructure Readiness">
+  <action>Verify traceability-matrix.md covers all PRD requirements — flag uncovered requirements as blocking</action>
+  <action>Verify ci-setup.md defines enforced quality gates (coverage %, pass rate thresholds) — flag advisory-only gates as a warning</action>
+  <action>Verify test-plan.md exists (from /gaia-test-design) — flag absence as blocking</action>
+  <action>Record findings as: test_plan_exists: true/false, traceability_complete: true/false, ci_gates_enforced: true/false</action>
+</step>
+<step n="6" title="Security Readiness">
   <action>Are security requirements documented in PRD?</action>
   <action>Is authentication/authorization defined in architecture?</action>
   <action>Are data privacy requirements addressed?</action>
 </step>
-<step n="6" title="Brownfield Completeness Check" optional="true" condition="brownfield-onboarding.md exists in {planning_artifacts}">
+<step n="7" title="Brownfield Completeness Check" optional="true" condition="brownfield-onboarding.md exists in {planning_artifacts}">
   <action>Skip this step if {planning_artifacts}/brownfield-onboarding.md does not exist. This step only applies to brownfield projects.</action>
   <action>Verify dependency-map.md exists and has: external services, infrastructure, library dependencies, Mermaid graph</action>
-  <action>Verify nfr-assessment.md exists and has: baseline summary table with real values (not placeholders)</action>
+  <action>Verify nfr-assessment.md exists at {test_artifacts}/nfr-assessment.md and has: baseline summary table with real values (not placeholders)</action>
   <action>If APIs were detected (check project-documentation.md for has_apis flag): verify api-documentation.md exists and has OpenAPI spec and endpoint inventory</action>
   <action>If events were detected (check project-documentation.md for has_events flag): verify event-catalog.md exists and has produced/consumed event tables</action>
   <action>If frontend was detected (check project-documentation.md for has_frontend flag): verify ux-design.md exists and has accessibility assessment</action>
@@ -39,7 +48,7 @@
   <action>Verify PRD NFR section references nfr-assessment.md baselines (not blank targets)</action>
   <action>Verify brownfield-onboarding.md links to all generated artifacts</action>
 </step>
-<step n="7" title="Generate Gate Report">
+<step n="8" title="Generate Gate Report">
   <template-output file="{planning_artifacts}/readiness-report.md">
     Generate readiness report with YAML frontmatter:
     ---
@@ -50,6 +59,9 @@
       architecture_complete: true/false
       stories_complete: true/false
       tea_ready: true/false
+      test_plan_exists: true/false
+      traceability_complete: true/false
+      ci_gates_enforced: true/false
       security_documented: true/false
       brownfield_complete: true/false/skipped
     blocking_issues:
@@ -57,5 +69,10 @@
     ---
     Then detailed findings for each gate.
   </template-output>
+</step>
+<step n="9" title="Optional: Adversarial Review">
+  <ask>Would you like to run an adversarial review on the readiness report and all planning artifacts? This is the last opportunity to catch flaws before implementation begins — it will challenge feasibility, hidden assumptions, and gaps across the PRD, architecture, and epics. Strongly recommended before committing to build. (yes/no)</ask>
+  <action>If yes: run /gaia-adversarial targeting {planning_artifacts}/readiness-report.md (reviewer will pull in referenced artifacts)</action>
+  <action>If no: skip — adversarial review can be run anytime later with /gaia-adversarial</action>
 </step>
 </workflow>
