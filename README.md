@@ -602,7 +602,7 @@ The single source of truth for project settings at `_gaia/_config/global.yaml`:
 
 ```yaml
 framework_name: "GAIA"
-framework_version: "1.4.0"
+framework_version: "1.4.1"
 
 user_name: "your-name"
 project_name: "your-project"
@@ -696,16 +696,28 @@ Pre-built team compositions for different project types:
                               9. Architecture with as-is/target diagrams
                              10. Epics/stories for gaps + developer knowledge base
 
-# Readiness & Implementation (same as greenfield from here)
+# Phase 3: Readiness
+/gaia-test-design          → create test plan (optional: scaffold test framework)
 /gaia-trace                → generate traceability matrix
 /gaia-ci-setup             → scaffold CI pipeline
 /gaia-readiness-check      → verify everything is ready (optional: adversarial review)
-/gaia-sprint-plan          → plan the first sprint
+
+# Phase 4: Implementation (repeat per sprint)
+/gaia-sprint-plan          → plan the sprint
+/gaia-create-story         → create detailed stories
+/gaia-validate-story       → validate story completeness
+/gaia-fix-story            → fix issues from validation
+/gaia-atdd                 → write acceptance tests (REQUIRED for high-risk stories)
 /gaia-dev-story            → implement gap stories
 /gaia-code-review          → review the code
 /gaia-qa-tests             → generate tests
 /gaia-security-review      → security audit
-/gaia-deploy-checklist     → pre-deploy verification
+/gaia-triage-findings      → triage dev findings into backlog
+/gaia-retro                → sprint retrospective
+
+# Phase 5: Deployment
+/gaia-release-plan         → plan the release
+/gaia-deploy-checklist     → pre-deploy verification (enforced gates)
 /gaia-post-deploy          → post-deploy health check
 ```
 
