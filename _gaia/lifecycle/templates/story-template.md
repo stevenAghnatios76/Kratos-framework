@@ -89,6 +89,8 @@ As a {role}, I want to {action}, so that {benefit}.
 | Code Review | PENDING | — |
 | QA Tests | PENDING | — |
 | Security Review | PENDING | — |
+| Test Automation | PENDING | — |
+| Test Review | PENDING | — |
 
 > Story moves to `done` only when ALL reviews show PASSED.
 

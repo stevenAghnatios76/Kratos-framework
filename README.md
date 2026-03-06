@@ -460,7 +460,19 @@ At each point you can accept or skip. It can also be run independently anytime w
 
 ### Lifecycle-Integrated Reviews
 
-In addition to the adversarial review, 5 other review tasks are integrated as optional prompts at natural lifecycle points:
+In addition to the adversarial review, several other tasks are integrated into the lifecycle at natural trigger points:
+
+**Review Gate members** (required — story cannot move to `done` without all 5 passing):
+
+| Review Command | Gate Row | Verdict | What It Checks |
+|---|---|---|---|
+| `/gaia-code-review` | Code Review | APPROVE / REQUEST_CHANGES | Correctness, security, performance, readability |
+| `/gaia-qa-tests` | QA Tests | PASSED / FAILED | E2E and API test generation + execution |
+| `/gaia-security-review` | Security Review | PASSED / FAILED | OWASP Top 10, secrets, auth patterns |
+| `/gaia-test-automate` | Test Automation | PASSED / FAILED | Coverage gaps, uncovered code paths |
+| `/gaia-test-review` | Test Review | PASSED / FAILED | Test quality, flakiness, isolation, determinism |
+
+**Optional prompts** (offered at natural lifecycle points — user can accept or skip):
 
 | Review Command | Trigger Point | When Prompted | Recommended For |
 |---|---|---|---|
@@ -469,8 +481,8 @@ In addition to the adversarial review, 5 other review tasks are integrated as op
 | `/gaia-edge-cases` | After `/gaia-create-epics` | End of epic/story creation (step 8) | Before sprint planning |
 | `/gaia-review-deps` | During `/gaia-brownfield` | After dependency map (step 5) | Brownfield projects |
 | `/gaia-review-perf` | After `/gaia-dev-story` | After post-complete gate (step 11) | Hot paths, data-heavy stories |
-
-`/gaia-review-security` is already covered by the triple review gate (`/gaia-security-review`) in Phase 4 and does not need a separate lifecycle prompt.
+| `/gaia-a11y-testing` | During `/gaia-deploy-checklist` | After loading context (step 2) | Frontend/user-facing applications |
+| `/gaia-mobile-testing` | During `/gaia-sprint-plan` | After story selection (step 4) | Mobile/responsive applications |
 
 All reviews can also be run independently anytime on any artifact or codebase.
 
@@ -618,7 +630,7 @@ The single source of truth for project settings at `_gaia/_config/global.yaml`:
 
 ```yaml
 framework_name: "GAIA"
-framework_version: "1.5.0"
+framework_version: "1.6.0"
 
 user_name: "your-name"
 project_name: "your-project"
@@ -678,21 +690,23 @@ Pre-built team compositions for different project types:
 /gaia-readiness-check      → verify everything is ready (optional: adversarial review)
 
 # Phase 4: Implementation (repeat per sprint)
-/gaia-sprint-plan          → plan the sprint
+/gaia-sprint-plan          → plan the sprint (optional: mobile testing)
 /gaia-create-story         → create detailed stories
 /gaia-validate-story       → validate story completeness
 /gaia-fix-story            → fix issues from validation
 /gaia-atdd                 → write acceptance tests (REQUIRED for high-risk stories)
 /gaia-dev-story            → implement stories (optional: performance review)
-/gaia-code-review          → review the code
-/gaia-qa-tests             → generate tests
-/gaia-security-review      → security audit
+/gaia-code-review          → review the code          ─┐
+/gaia-qa-tests             → generate tests             │ Review Gate
+/gaia-security-review      → security audit              │ (all 5 must
+/gaia-test-automate        → expand test coverage        │  PASS before
+/gaia-test-review          → review test quality        ─┘  story → done)
 /gaia-triage-findings      → triage dev findings into backlog
 /gaia-retro                → sprint retrospective
 
 # Phase 5: Deployment
 /gaia-release-plan         → plan the release
-/gaia-deploy-checklist     → pre-deploy verification (enforced gates)
+/gaia-deploy-checklist     → pre-deploy verification (optional: a11y testing)
 /gaia-post-deploy          → post-deploy health check
 ```
 
@@ -719,21 +733,23 @@ Pre-built team compositions for different project types:
 /gaia-readiness-check      → verify everything is ready (optional: adversarial review)
 
 # Phase 4: Implementation (repeat per sprint)
-/gaia-sprint-plan          → plan the sprint
+/gaia-sprint-plan          → plan the sprint (optional: mobile testing)
 /gaia-create-story         → create detailed stories
 /gaia-validate-story       → validate story completeness
 /gaia-fix-story            → fix issues from validation
 /gaia-atdd                 → write acceptance tests (REQUIRED for high-risk stories)
 /gaia-dev-story            → implement gap stories (optional: performance review)
-/gaia-code-review          → review the code
-/gaia-qa-tests             → generate tests
-/gaia-security-review      → security audit
+/gaia-code-review          → review the code          ─┐
+/gaia-qa-tests             → generate tests             │ Review Gate
+/gaia-security-review      → security audit              │ (all 5 must
+/gaia-test-automate        → expand test coverage        │  PASS before
+/gaia-test-review          → review test quality        ─┘  story → done)
 /gaia-triage-findings      → triage dev findings into backlog
 /gaia-retro                → sprint retrospective
 
 # Phase 5: Deployment
 /gaia-release-plan         → plan the release
-/gaia-deploy-checklist     → pre-deploy verification (enforced gates)
+/gaia-deploy-checklist     → pre-deploy verification (optional: a11y testing)
 /gaia-post-deploy          → post-deploy health check
 ```
 

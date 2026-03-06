@@ -6,7 +6,7 @@ set -euo pipefail
 # Installs, updates, validates, and reports on GAIA installations.
 # ─────────────────────────────────────────────────────────────────────────────
 
-readonly VERSION="1.5.0"
+readonly VERSION="1.6.0"
 readonly GITHUB_REPO="https://github.com/J-louage/Gaia-framework.git"
 readonly MANIFEST_REL="_gaia/_config/manifest.yaml"
 

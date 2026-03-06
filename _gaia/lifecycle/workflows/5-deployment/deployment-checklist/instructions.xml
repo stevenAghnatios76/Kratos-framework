@@ -12,24 +12,29 @@
   <action>Read {planning_artifacts}/readiness-report.md — verify PASS status</action>
   <action>Identify release scope: what stories, features, fixes are included</action>
 </step>
-<step n="2" title="Pre-Deployment Checks">
+<step n="2" title="Optional: Accessibility Testing">
+  <ask>Would you like to create an accessibility test plan? /gaia-a11y-testing will define WCAG target level, design axe-core integration, create manual test procedures for keyboard navigation and screen readers, audit ARIA roles, and prioritize remediation. Recommended for frontend/user-facing applications. (yes/no)</ask>
+  <action>If yes: run /gaia-a11y-testing</action>
+  <action>If no: skip — accessibility testing can be run anytime later with /gaia-a11y-testing</action>
+</step>
+<step n="3" title="Pre-Deployment Checks">
   <action>Verify DB migrations are tested and reversible</action>
   <action>Confirm feature flags are configured correctly</action>
   <action>Check configuration changes are applied to target environment</action>
   <action>Verify secrets rotation is complete if required</action>
 </step>
-<step n="3" title="Dependency Verification">
+<step n="4" title="Dependency Verification">
   <action>Confirm external service availability (APIs, databases, caches)</action>
   <action>Verify API compatibility with consumers</action>
   <action>Check third-party service SLAs and maintenance windows</action>
 </step>
-<step n="4" title="Rollback Readiness">
+<step n="5" title="Rollback Readiness">
   <action>Verify rollback plan exists and is documented</action>
   <action>Confirm rollback has been tested in staging</action>
   <action>Verify DB migration rollback scripts work</action>
   <action>Define rollback trigger criteria</action>
 </step>
-<step n="5" title="Approval Gates">
+<step n="6" title="Approval Gates">
   <action>Verify readiness-report.md status is PASS — if not PASS, HALT deployment</action>
   <action>Verify traceability-matrix.md coverage is complete — flag gaps as blocking</action>
   <action>Verify ci-setup.md quality gates are enforced (not advisory-only)</action>
@@ -40,7 +45,7 @@
   <ask>Stakeholder approval: confirm release scope is approved. Enter CONFIRMED.</ask>
   <check if="stakeholder_approval != CONFIRMED">HALT: Stakeholder approval required before deployment.</check>
 </step>
-<step n="6" title="Generate Checklist">
+<step n="7" title="Generate Checklist">
   <template-output file="{implementation_artifacts}/deployment-checklist-{date}.md">
     Generate deployment checklist with: pre-deployment checks, dependency status, rollback readiness, approval gates, go/no-go recommendation.
   </template-output>

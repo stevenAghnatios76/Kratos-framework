@@ -67,9 +67,9 @@
   <action>Set story status to 'review' in story file</action>
   <action>Update sprint-status.yaml: set story to 'review'</action>
   <action>Append files changed list to story file</action>
-  <action>Initialize Review Gate section in story file: set all three rows (Code Review, QA Tests, Security Review) to PENDING with report link "—". If Review Gate section already exists, reset all rows to PENDING.</action>
+  <action>Initialize Review Gate section in story file: set all five rows (Code Review, QA Tests, Security Review, Test Automation, Test Review) to PENDING with report link "—". If Review Gate section already exists, reset all rows to PENDING.</action>
   <template-output file="{implementation_artifacts}/{story_key}.md">
-    Update story file with status change to 'review', list of files changed, and initialized Review Gate table (all PENDING).
+    Update story file with status change to 'review', list of files changed, and initialized Review Gate table (all 5 rows PENDING).
   </template-output>
 </step>
 </workflow>

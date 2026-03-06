@@ -2,7 +2,7 @@
 inherits: "{project-root}/_gaia/_config/global.yaml"
 
 module_name: "testing"
-module_version: "1.1.0"
+module_version: "1.2.0"
 
 test_artifacts: "{project-root}/docs/test-artifacts"
 knowledge_path: "{project-root}/_gaia/testing/knowledge"
