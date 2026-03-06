@@ -9,6 +9,7 @@ validation-target: 'Story file'
 - [ ] Subtasks defined
 - [ ] Definition of Done checklist present
 ## Quality
+- [ ] Each AC uses Given/When/Then format
 - [ ] Each AC is testable
 - [ ] Dependencies correctly declared
 - [ ] Status set to validating

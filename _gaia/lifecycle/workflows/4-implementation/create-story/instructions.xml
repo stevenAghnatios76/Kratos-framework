@@ -1,6 +1,7 @@
 <workflow name="create-story">
 <critical>
   <mandate>Story files must include YAML frontmatter with key, status, dependencies</mandate>
+  <mandate>All acceptance criteria MUST use Given/When/Then format: "Given {context}, when {action}, then {expected result}"</mandate>
   <mandate>Check web access availability if story references external APIs</mandate>
 </critical>
 <step n="1" title="Select Story">
@@ -15,7 +16,7 @@
   <check if="no_web_access">Note limitation in story file</check>
 </step>
 <step n="4" title="Elaborate Story">
-  <action>Expand acceptance criteria with detailed test conditions</action>
+  <action>Expand acceptance criteria in Given/When/Then format: "Given {context}, when {action}, then {expected result}"</action>
   <action>Add technical notes from architecture context</action>
   <action>Define subtasks for implementation</action>
 </step>
