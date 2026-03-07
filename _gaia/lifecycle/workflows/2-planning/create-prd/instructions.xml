@@ -48,8 +48,8 @@
   </template-output>
 </step>
 <step n="11" title="Optional: Adversarial Review">
-  <ask>Would you like to run an adversarial review on the PRD? This will critically examine the document for flaws, gaps, and weaknesses from 10 different perspectives (feasibility, completeness, contradictions, assumptions, scale, failure modes, dependencies, security, user impact, business risk). Recommended for complex or high-stakes products. (yes/no)</ask>
-  <action>If yes: run /gaia-adversarial targeting {planning_artifacts}/prd.md</action>
-  <action>If no: skip — adversarial review can be run anytime later with /gaia-adversarial</action>
+  <ask>Would you like to run an adversarial review on the PRD? Open a new Claude Code terminal and run /gaia-adversarial — it runs in a separate context to preserve this session's budget. It will critically examine the document from 10 perspectives (feasibility, completeness, contradictions, assumptions, scale, failure modes, dependencies, security, user impact, business risk). Recommended for complex or high-stakes products. (yes, I'll open a new terminal / skip)</ask>
+  <action>If yes: the user opens a new terminal and runs /gaia-adversarial targeting {planning_artifacts}/prd.md. Wait for confirmation before proceeding.</action>
+  <action>If skip: adversarial review can be run anytime later with /gaia-adversarial in a separate terminal</action>
 </step>
 </workflow>

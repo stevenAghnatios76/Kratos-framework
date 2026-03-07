@@ -13,9 +13,9 @@
   <action>Identify release scope: what stories, features, fixes are included</action>
 </step>
 <step n="2" title="Optional: Accessibility Testing">
-  <ask>Would you like to create an accessibility test plan? /gaia-a11y-testing will define WCAG target level, design axe-core integration, create manual test procedures for keyboard navigation and screen readers, audit ARIA roles, and prioritize remediation. Recommended for frontend/user-facing applications. (yes/no)</ask>
-  <action>If yes: run /gaia-a11y-testing</action>
-  <action>If no: skip — accessibility testing can be run anytime later with /gaia-a11y-testing</action>
+  <ask>Would you like to create an accessibility test plan? Open a new Claude Code terminal and run /gaia-a11y-testing — it runs in a separate context to preserve this session's budget. It will define WCAG target level, design axe-core integration, create manual test procedures for keyboard navigation and screen readers, audit ARIA roles, and prioritize remediation. Recommended for frontend/user-facing applications. (yes, I'll open a new terminal / skip)</ask>
+  <action>If yes: the user opens a new terminal and runs /gaia-a11y-testing. Wait for confirmation before proceeding.</action>
+  <action>If skip: accessibility testing can be set up anytime later with /gaia-a11y-testing in a separate terminal</action>
 </step>
 <step n="3" title="Pre-Deployment Checks">
   <action>Verify DB migrations are tested and reversible</action>

@@ -35,8 +35,8 @@
   </template-output>
 </step>
 <step n="8" title="Optional: Accessibility Review">
-  <ask>Would you like to review the UX design for WCAG 2.1 accessibility compliance? /gaia-review-a11y will check ARIA usage, keyboard navigation, color contrast, screen reader support, and semantic structure. Recommended for user-facing applications. (yes/no)</ask>
-  <action>If yes: run /gaia-review-a11y targeting {planning_artifacts}/ux-design.md</action>
-  <action>If no: skip — accessibility review can be run anytime later with /gaia-review-a11y</action>
+  <ask>Would you like to review the UX design for WCAG 2.1 accessibility compliance? Open a new Claude Code terminal and run /gaia-review-a11y — it runs in a separate context to preserve this session's budget. It will check ARIA usage, keyboard navigation, color contrast, screen reader support, and semantic structure. Recommended for user-facing applications. (yes, I'll open a new terminal / skip)</ask>
+  <action>If yes: the user opens a new terminal and runs /gaia-review-a11y targeting {planning_artifacts}/ux-design.md. Wait for confirmation before proceeding.</action>
+  <action>If skip: accessibility review can be run anytime later with /gaia-review-a11y in a separate terminal</action>
 </step>
 </workflow>

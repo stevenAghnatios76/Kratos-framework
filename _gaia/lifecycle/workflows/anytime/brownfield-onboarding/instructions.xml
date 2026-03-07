@@ -75,9 +75,9 @@
   <template-output file="{planning_artifacts}/dependency-map.md">
     Generate dependency map following the dependency-map-template. Include external service table, infrastructure table, key library table with CVE risk, Mermaid dependency graph, contracts/SLAs, and risk recommendations.
   </template-output>
-  <ask>Would you like to run a dependency audit? /gaia-review-deps will scan for outdated versions, known CVEs, license conflicts, and unused dependencies. Recommended for brownfield projects. (yes/no)</ask>
-  <action>If yes: run /gaia-review-deps targeting {planning_artifacts}/dependency-map.md</action>
-  <action>If no: skip — dependency audit can be run anytime later with /gaia-review-deps</action>
+  <ask>Would you like to run a dependency audit? Open a new Claude Code terminal and run /gaia-review-deps — it runs in a separate context to preserve this session's budget. It will scan for outdated versions, known CVEs, license conflicts, and unused dependencies. Recommended for brownfield projects. (yes, I'll open a new terminal / skip)</ask>
+  <action>If yes: the user opens a new terminal, navigates to the project root, and runs /gaia-review-deps. Wait for them to confirm completion before proceeding.</action>
+  <action>If skip: dependency audit can be run anytime later with /gaia-review-deps in a separate terminal</action>
 </step>
 
 <step n="6" title="NFR Assessment &amp; Baselines">
@@ -129,8 +129,8 @@
 
 <step n="9" title="Architecture, Stories &amp; Onboarding">
   <action>Architecture and stories are created using the Phase 3 workflows which auto-detect brownfield mode from the PRD "Mode: Brownfield" header set in step 8.</action>
-  <ask>Run /gaia-create-arch to generate the brownfield architecture document (as-is C4 diagrams + target for gaps + delta table + migration strategy). Continue? (yes)</ask>
-  <ask>Run /gaia-create-epics to generate gap-only stories with risk levels, dependency topology, and priority ordering. This will also generate the brownfield-onboarding.md knowledge base. Continue? (yes)</ask>
+  <ask>Open a new Claude Code terminal and run /gaia-create-arch to generate the brownfield architecture document (as-is C4 diagrams + target for gaps + delta table + migration strategy). It auto-detects brownfield mode from the PRD header. Confirm here once it completes. (ok)</ask>
+  <ask>Open a new Claude Code terminal and run /gaia-create-epics to generate gap-only stories with risk levels, dependency topology, and priority ordering. This will also generate the brownfield-onboarding.md knowledge base. Confirm here once it completes. (ok)</ask>
 </step>
 
 <next-step command="/gaia-readiness-check">

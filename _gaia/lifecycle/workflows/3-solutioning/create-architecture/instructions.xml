@@ -65,13 +65,13 @@
   </template-output>
 </step>
 <step n="10" title="Optional: API Design Review">
-  <ask>Would you like to review the API design against REST standards? /gaia-review-api will check naming conventions, HTTP methods, status codes, versioning, pagination, and error formats. Recommended if your architecture includes APIs. (yes/no)</ask>
-  <action>If yes: run /gaia-review-api targeting the API Design section of {planning_artifacts}/architecture.md</action>
-  <action>If no: skip — API review can be run anytime later with /gaia-review-api</action>
+  <ask>Would you like to review the API design against REST standards? Open a new Claude Code terminal and run /gaia-review-api — it runs in a separate context to preserve this session's budget. It will check naming conventions, HTTP methods, status codes, versioning, pagination, and error formats. Recommended if your architecture includes APIs. (yes, I'll open a new terminal / skip)</ask>
+  <action>If yes: the user opens a new terminal and runs /gaia-review-api targeting the API Design section of {planning_artifacts}/architecture.md. Wait for confirmation before proceeding.</action>
+  <action>If skip: API review can be run anytime later with /gaia-review-api in a separate terminal</action>
 </step>
 <step n="11" title="Optional: Adversarial Review">
-  <ask>Would you like to run an adversarial review on the architecture? This will critically challenge technical decisions, scalability assumptions, failure modes, security surfaces, and dependency risks. Recommended for distributed systems or high-scale projects. (yes/no)</ask>
-  <action>If yes: run /gaia-adversarial targeting {planning_artifacts}/architecture.md</action>
-  <action>If no: skip — adversarial review can be run anytime later with /gaia-adversarial</action>
+  <ask>Would you like to run an adversarial review on the architecture? Open a new Claude Code terminal and run /gaia-adversarial — it runs in a separate context to preserve this session's budget. It will critically challenge technical decisions, scalability assumptions, failure modes, security surfaces, and dependency risks. Recommended for distributed systems or high-scale projects. (yes, I'll open a new terminal / skip)</ask>
+  <action>If yes: the user opens a new terminal and runs /gaia-adversarial targeting {planning_artifacts}/architecture.md. Wait for confirmation before proceeding.</action>
+  <action>If skip: adversarial review can be run anytime later with /gaia-adversarial in a separate terminal</action>
 </step>
 </workflow>

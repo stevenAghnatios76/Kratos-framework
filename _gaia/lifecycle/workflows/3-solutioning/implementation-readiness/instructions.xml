@@ -71,8 +71,8 @@
   </template-output>
 </step>
 <step n="9" title="Optional: Adversarial Review">
-  <ask>Would you like to run an adversarial review on the readiness report and all planning artifacts? This is the last opportunity to catch flaws before implementation begins — it will challenge feasibility, hidden assumptions, and gaps across the PRD, architecture, and epics. Strongly recommended before committing to build. (yes/no)</ask>
-  <action>If yes: run /gaia-adversarial targeting {planning_artifacts}/readiness-report.md (reviewer will pull in referenced artifacts)</action>
-  <action>If no: skip — adversarial review can be run anytime later with /gaia-adversarial</action>
+  <ask>Would you like to run an adversarial review on the readiness report and all planning artifacts? Open a new Claude Code terminal and run /gaia-adversarial — it runs in a separate context to preserve this session's budget. This is the last opportunity to catch flaws before implementation begins. Strongly recommended before committing to build. (yes, I'll open a new terminal / skip)</ask>
+  <action>If yes: the user opens a new terminal and runs /gaia-adversarial targeting {planning_artifacts}/readiness-report.md (reviewer will pull in referenced artifacts). Wait for confirmation before proceeding.</action>
+  <action>If skip: adversarial review can be run anytime later with /gaia-adversarial in a separate terminal</action>
 </step>
 </workflow>
