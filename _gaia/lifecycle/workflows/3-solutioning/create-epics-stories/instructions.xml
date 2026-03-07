@@ -8,29 +8,40 @@
   <action>Read {planning_artifacts}/prd.md — extract functional requirements</action>
   <action>Read {planning_artifacts}/architecture.md — extract technical components</action>
 </step>
-<step n="2" title="Define Epics">
+<step n="2" title="Detect Mode">
+  <action>Check {planning_artifacts}/prd.md header for "Mode: Brownfield"</action>
+  <check if="brownfield mode detected">
+    Set {mode} = brownfield. Stories must cover gap requirements ONLY — do NOT create stories for existing implemented features.
+  </check>
+  <check if="no brownfield header">
+    Set {mode} = greenfield. Create stories for all features from the PRD.
+  </check>
+</step>
+<step n="3" title="Define Epics">
   <action>Group related features into logical epics</action>
   <action>Each epic: name, description, goal, success criteria</action>
+  <action>Brownfield: epics should focus on gap closure — not existing functionality</action>
 </step>
-<step n="3" title="Break Into Stories">
+<step n="4" title="Break Into Stories">
   <action>For each epic, create user stories</action>
   <action>Each story needs: title, description, acceptance criteria, size estimate (S/M/L/XL)</action>
   <action>Use format: "As a [user], I want to [action] so that [benefit]"</action>
+  <action>Brownfield: stories must trace to PRD gap requirement IDs. Do NOT create stories for existing implemented features.</action>
 </step>
-<step n="4" title="Apply Test-Plan Risk Levels">
+<step n="5" title="Apply Test-Plan Risk Levels">
   <action>Read {test_artifacts}/test-plan.md — extract risk assessment: high-risk areas (revenue-critical, security-sensitive, complex logic)</action>
   <action>For each story: if it touches a high-risk component, set risk_level: high. Otherwise medium or low.</action>
   <action>High-risk stories: add to Dev Notes: "Risk: HIGH — run /gaia-atdd before /gaia-dev-story"</action>
 </step>
-<step n="5" title="Declare Dependencies">
+<step n="6" title="Declare Dependencies">
   <action>For each story, declare depends_on: [story-ids] and blocks: [story-ids]</action>
   <action>Ensure no circular dependencies</action>
 </step>
-<step n="6" title="Priority Ordering">
+<step n="7" title="Priority Ordering">
   <action>Sort stories by: dependency topology first, then business priority</action>
   <action>Assign priority: P0 (must-have), P1 (should-have), P2 (nice-to-have)</action>
 </step>
-<step n="7" title="Generate Output">
+<step n="8" title="Generate Output">
   <template-output file="{planning_artifacts}/epics-and-stories.md">
     Generate epics and stories document. Each story formatted as:
     ### Story {epic-N}-{story-N}: {Title}
@@ -44,12 +55,23 @@
       - AC1: {criteria}
   </template-output>
 </step>
-<step n="8" title="Optional: Edge Case Analysis">
+<step n="9" title="Brownfield: Generate Onboarding Knowledge Base" optional="true" condition="{mode} == brownfield">
+  <action>Skip this step if {mode} is greenfield.</action>
+  <action>Read the brownfield onboarding template from {installed_path}/../../templates/brownfield-onboarding-template.md</action>
+  <action>Generate onboarding doc as a knowledge base index linking to ALL artifacts: project-documentation.md, api-documentation.md (if exists), ux-design.md (if exists), event-catalog.md (if exists), dependency-map.md, nfr-assessment.md, performance-test-plan-{date}.md, prd.md, architecture.md, epics-and-stories.md</action>
+  <action>Include: quick-start guide, project overview, architecture overview, API reference, UX patterns (if frontend), event architecture (if events), dependencies, NFR baselines, performance test plan, gap analysis, stories, conventions, key files</action>
+  <action>Skip sections for optional artifacts that were not generated</action>
+  <action>Include a "Reading Order for New Developers" section at the end</action>
+  <template-output file="{planning_artifacts}/brownfield-onboarding.md">
+    Generate developer knowledge base following the brownfield-onboarding-template. Link to every artifact produced by the brownfield workflow. Skip sections for artifacts that were not generated (optional steps that were skipped). Include quick-start, architecture summary, conventions, key files, and reading order.
+  </template-output>
+</step>
+<step n="10" title="Optional: Edge Case Analysis">
   <ask>Would you like to hunt for edge cases in the stories? /gaia-edge-cases will identify boundary conditions, race conditions, null/empty inputs, overflow scenarios, and error chains. Recommended to catch gaps before sprint planning. (yes/no)</ask>
   <action>If yes: run /gaia-edge-cases targeting {planning_artifacts}/epics-and-stories.md</action>
   <action>If no: skip — edge case analysis can be run anytime later with /gaia-edge-cases</action>
 </step>
-<step n="9" title="Optional: Adversarial Review">
+<step n="11" title="Optional: Adversarial Review">
   <ask>Would you like to run an adversarial review on the epics and stories? This will challenge story completeness, missing edge cases, dependency gaps, and acceptance criteria quality. Recommended before sprint planning. (yes/no)</ask>
   <action>If yes: run /gaia-adversarial targeting {planning_artifacts}/epics-and-stories.md</action>
   <action>If no: skip — adversarial review can be run anytime later with /gaia-adversarial</action>

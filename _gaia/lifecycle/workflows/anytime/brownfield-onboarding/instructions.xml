@@ -127,37 +127,10 @@
   </template-output>
 </step>
 
-<step n="9" title="Map Architecture with Diagrams">
-  <action>Read the brownfield architecture template from {installed_path}/../../templates/brownfield-architecture-template.md</action>
-  <action>Document as-is architecture with Mermaid diagrams:</action>
-  <action>— System context diagram (C4 Level 1) using Mermaid C4 syntax</action>
-  <action>— Container diagram (C4 Level 2) using Mermaid C4 syntax</action>
-  <action>— 3-5 sequence diagrams for key system flows using Mermaid sequence diagram syntax</action>
-  <action>— Data flow diagram using Mermaid flowchart syntax</action>
-  <action>Document target architecture for gaps identified in the PRD</action>
-  <action>Create as-is vs target delta table</action>
-  <action>Define migration strategy from as-is to target</action>
-  <action>Cross-reference: api-documentation.md, event-catalog.md, dependency-map.md in the Integration Architecture section</action>
-  <action>Document infrastructure, security, and cross-cutting concerns</action>
-  <template-output file="{planning_artifacts}/architecture.md">
-    Generate architecture document following the brownfield-architecture-template. Must include: C4 Level 1 and Level 2 Mermaid diagrams, 3-5 Mermaid sequence diagrams for key flows, Mermaid data flow diagram, as-is/target delta table, migration strategy, and cross-references to api-documentation.md, event-catalog.md, and dependency-map.md.
-  </template-output>
-</step>
-
-<step n="10" title="Create Epics/Stories &amp; Onboard Developer">
-  <action>Invoke create-epics-stories for gap features only — do NOT create stories for existing implemented features</action>
-  <action>Stories must trace to PRD requirements from step 8</action>
-  <template-output file="{planning_artifacts}/epics-and-stories.md">
-    Generate epics and stories for gap features only. Every story must have acceptance criteria. Stories must trace to PRD requirement IDs.
-  </template-output>
-  <action>Read the brownfield onboarding template from {installed_path}/../../templates/brownfield-onboarding-template.md</action>
-  <action>Generate onboarding doc as a knowledge base index linking to ALL artifacts generated in steps 1-9</action>
-  <action>Include: quick-start guide, project overview, architecture overview, API reference, UX patterns (if frontend), event architecture (if events), dependencies, NFR baselines (at {test_artifacts}/nfr-assessment.md), performance test plan (at {test_artifacts}/performance-test-plan-{date}.md), gap analysis, stories, conventions, key files</action>
-  <action>Skip sections for optional artifacts that were not generated (no API docs if no APIs, etc.)</action>
-  <action>Include a "Reading Order for New Developers" section at the end</action>
-  <template-output file="{planning_artifacts}/brownfield-onboarding.md">
-    Generate developer knowledge base following the brownfield-onboarding-template. Link to every artifact produced by this workflow. Skip sections for artifacts that were not generated (optional steps that were skipped). Include quick-start, architecture summary, conventions, key files, and reading order.
-  </template-output>
+<step n="9" title="Architecture, Stories &amp; Onboarding">
+  <action>Architecture and stories are created using the Phase 3 workflows which auto-detect brownfield mode from the PRD "Mode: Brownfield" header set in step 8.</action>
+  <ask>Run /gaia-create-arch to generate the brownfield architecture document (as-is C4 diagrams + target for gaps + delta table + migration strategy). Continue? (yes)</ask>
+  <ask>Run /gaia-create-epics to generate gap-only stories with risk levels, dependency topology, and priority ordering. This will also generate the brownfield-onboarding.md knowledge base. Continue? (yes)</ask>
 </step>
 
 <next-step command="/gaia-readiness-check">

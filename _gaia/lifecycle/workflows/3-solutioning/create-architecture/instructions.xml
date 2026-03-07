@@ -8,48 +8,68 @@
   <action>Read {planning_artifacts}/prd.md — extract requirements</action>
   <action>Read {planning_artifacts}/ux-design.md if available — extract UI requirements</action>
 </step>
-<step n="2" title="Technology Selection">
-  <action>Select tech stack with rationale for each choice</action>
-  <action>Consider: team expertise, scalability needs, ecosystem maturity</action>
+<step n="2" title="Detect Mode">
+  <action>Check {planning_artifacts}/prd.md header for "Mode: Brownfield"</action>
+  <check if="brownfield mode detected">
+    Set {mode} = brownfield. Read brownfield-architecture-template.md from {installed_path}/../../templates/.
+    Also read for cross-references: {planning_artifacts}/api-documentation.md, {planning_artifacts}/event-catalog.md, {planning_artifacts}/dependency-map.md (skip any that don't exist).
+  </check>
+  <check if="no brownfield header">
+    Set {mode} = greenfield. Read architecture-template.md from {installed_path}/../../templates/.
+  </check>
+</step>
+<step n="3" title="Technology Selection">
+  <action>Greenfield: select tech stack with rationale for each choice. Consider: team expertise, scalability needs, ecosystem maturity.</action>
+  <action>Brownfield: discover existing tech stack from project-documentation.md and code scan. Mark ADR status as "Existing" for discovered decisions.</action>
   <action>Record decision as ADR in _memory/architect-sidecar/architecture-decisions.md</action>
 </step>
-<step n="3" title="System Architecture">
-  <action>Define component diagram and service boundaries</action>
-  <action>Describe communication patterns between components</action>
-  <action>Record architectural style decision as ADR</action>
+<step n="4" title="System Architecture">
+  <action>Greenfield: define component diagram and service boundaries. Describe communication patterns. Record architectural style as ADR.</action>
+  <action>Brownfield: document as-is architecture with Mermaid diagrams:</action>
+  <action>— System context diagram (C4 Level 1) using Mermaid C4 syntax</action>
+  <action>— Container diagram (C4 Level 2) using Mermaid C4 syntax</action>
+  <action>— 3-5 sequence diagrams for key system flows using Mermaid sequence diagram syntax</action>
+  <action>— Data flow diagram using Mermaid flowchart syntax</action>
+  <action>Brownfield: document target architecture for gaps identified in the PRD</action>
+  <action>Brownfield: create as-is vs target delta table</action>
 </step>
-<step n="4" title="Data Architecture">
+<step n="5" title="Data Architecture">
   <action>Design database schema and data model</action>
   <action>Define data flow between components</action>
   <action>Specify data storage, caching, and replication strategies</action>
 </step>
-<step n="5" title="API Design">
+<step n="6" title="API Design">
   <action>Define API endpoint overview</action>
   <action>Specify authentication and authorization strategy</action>
   <action>Document API versioning approach</action>
 </step>
-<step n="6" title="Infrastructure">
+<step n="7" title="Infrastructure &amp; Cross-Cutting Concerns">
   <action>Define deployment topology and environments (dev, staging, prod)</action>
   <action>Specify hosting, containerization, and orchestration choices</action>
   <action>Define monitoring and logging strategy</action>
+  <action>Brownfield: document security architecture, cross-cutting concerns with current state and gaps</action>
+  <action>Brownfield: define migration strategy from as-is to target architecture</action>
+  <action>Brownfield: cross-reference api-documentation.md, event-catalog.md, dependency-map.md in the Integration Architecture section</action>
 </step>
-<step n="7" title="Architecture Decision Records">
-  <action>Review all decisions made in steps 2-6</action>
+<step n="8" title="Architecture Decision Records">
+  <action>Review all decisions made in steps 3-7</action>
   <action>Ensure each significant decision is recorded as ADR</action>
   <action>ADR format: title, date, status, context, decision, consequences</action>
+  <action>Brownfield: mark existing decisions as status "Existing", new gap-related decisions as "Proposed"</action>
   <action>Append all ADRs to _memory/architect-sidecar/architecture-decisions.md</action>
 </step>
-<step n="8" title="Generate Output">
+<step n="9" title="Generate Output">
   <template-output file="{planning_artifacts}/architecture.md">
-    Generate architecture document with: technology stack, system architecture, data architecture, API design, infrastructure plan, and ADR references.
+    Greenfield: generate architecture document with: technology stack, system architecture, data architecture, API design, infrastructure plan, and ADR references.
+    Brownfield: generate architecture document following brownfield-architecture-template. Must include: C4 Level 1 and Level 2 Mermaid diagrams, 3-5 Mermaid sequence diagrams for key flows, Mermaid data flow diagram, as-is/target delta table, migration strategy, and cross-references to api-documentation.md, event-catalog.md, and dependency-map.md.
   </template-output>
 </step>
-<step n="9" title="Optional: API Design Review">
+<step n="10" title="Optional: API Design Review">
   <ask>Would you like to review the API design against REST standards? /gaia-review-api will check naming conventions, HTTP methods, status codes, versioning, pagination, and error formats. Recommended if your architecture includes APIs. (yes/no)</ask>
   <action>If yes: run /gaia-review-api targeting the API Design section of {planning_artifacts}/architecture.md</action>
   <action>If no: skip — API review can be run anytime later with /gaia-review-api</action>
 </step>
-<step n="10" title="Optional: Adversarial Review">
+<step n="11" title="Optional: Adversarial Review">
   <ask>Would you like to run an adversarial review on the architecture? This will critically challenge technical decisions, scalability assumptions, failure modes, security surfaces, and dependency risks. Recommended for distributed systems or high-scale projects. (yes/no)</ask>
   <action>If yes: run /gaia-adversarial targeting {planning_artifacts}/architecture.md</action>
   <action>If no: skip — adversarial review can be run anytime later with /gaia-adversarial</action>
