@@ -21,5 +21,6 @@ validation-target: 'Story implementation'
 ## Completion
 - [ ] Status updated to review
 - [ ] sprint-status.yaml updated
+- [ ] All Definition of Done items verified complete
 - [ ] Files changed list in story file
 - [ ] Checkpoint archived

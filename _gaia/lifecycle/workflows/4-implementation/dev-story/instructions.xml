@@ -62,7 +62,9 @@
   <action>Verify all tests pass</action>
   <action>Verify all acceptance criteria met</action>
   <action>Verify all subtasks marked complete</action>
+  <action>Read the "Definition of Done" section — verify every item is checked (- [x]). If any item is unchecked (- [ ]): list the unchecked items and HALT.</action>
   <check if="any_test_fails">HALT: All tests must pass before marking complete</check>
+  <check if="any_dod_unchecked">HALT: All Definition of Done items must be checked before moving to review. Unchecked items: {list}</check>
 </step>
 <step n="11" title="Update Status">
   <action>Set story status to 'review' in story file</action>
