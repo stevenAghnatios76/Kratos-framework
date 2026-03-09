@@ -50,6 +50,7 @@ validation-target: 'Brownfield onboarding output'
 - [ ] CI performance gates configured with pass/fail thresholds
 - [ ] Output at {test_artifacts}/performance-test-plan-{date}.md
 ## Gap Analysis
+- [ ] If prior prd.md existed, user confirmed overwrite or alternate filename used
 - [ ] PRD created with gap-focused content only
 - [ ] NFR section includes current baseline and target from nfr-assessment.md
 - [ ] Upstream artifacts referenced (api-docs, event-catalog, dependency-map, ux-design)

@@ -40,6 +40,10 @@
   <action>  d. Mark subtask complete in story file</action>
   <action>  e. Write checkpoint</action>
   <action>  f. Update files_touched in checkpoint: for each file created/modified so far, record path, checksum (shasum -a 256), last_modified (ISO 8601)</action>
+  <action>  g. Conditional checks — for each that applies to this story:
+    — If API boundary changes: write or update contract tests (consumer/provider)
+    — If database schema changes: create reversible migration script (UP + DOWN)
+    — If gradual rollout needed: implement feature flag wrapping new code path</action>
 </step>
 <step n="7" title="Capture Findings">
   <action>Review any out-of-scope issues discovered during implementation (e.g., missing setup scripts, environment gaps, tech debt, broken tooling)</action>

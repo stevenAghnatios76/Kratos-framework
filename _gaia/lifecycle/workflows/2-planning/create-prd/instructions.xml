@@ -8,6 +8,7 @@
 <step n="1" title="Load Product Brief">
   <action>Read {planning_artifacts}/product-brief.md</action>
   <action>Extract vision, target users, problem statement, proposed solution</action>
+  <check if="{planning_artifacts}/prd.md exists and contains 'Mode: Brownfield'">WARN: A brownfield PRD exists at {planning_artifacts}/prd.md. Continuing will overwrite it. Confirm with user before proceeding.</check>
 </step>
 <step n="2" title="User Interviews">
   <ask>Who are the primary user types?</ask>
@@ -36,6 +37,7 @@
 <step n="7" title="Integration Requirements">
   <action>List external systems, APIs, and third-party services</action>
   <action>Define integration patterns and data exchange formats</action>
+  <action>For each critical dependency: define failure mode, fallback behavior, and SLA expectations</action>
 </step>
 <step n="8" title="Out of Scope">
   <action>List features, integrations, and use cases explicitly excluded from this release</action>

@@ -61,7 +61,9 @@ used_by: ['create-prd']
 
 ## 9. Dependencies
 
-- {External system or team dependency}
+| Dependency | Type | Failure Mode | Fallback Behavior | SLA Expectation |
+|------------|------|-------------|-------------------|-----------------|
+| {service or system} | {API / Database / Message Queue / CDN / Auth Provider} | {What happens when it's unavailable} | {Graceful degradation / Retry / Queue / Circuit breaker / Hard fail} | {Expected uptime / latency / throughput} |
 
 ## 10. Milestones
 

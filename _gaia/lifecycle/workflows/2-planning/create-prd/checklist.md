@@ -15,6 +15,7 @@ validation-rules:
 - [ ] User journeys mapped
 - [ ] Data requirements specified
 - [ ] Integration requirements listed
+- [ ] Critical dependencies have failure modes and fallback behavior defined
 - [ ] Out of scope section present
 - [ ] Constraints documented
 - [ ] Success criteria defined

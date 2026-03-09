@@ -122,6 +122,7 @@
   <action>User Stories = stories for gap features only, not existing functionality</action>
   <action>Functional Requirements = gap requirements organized by priority</action>
   <action>Non-Functional Requirements = NFR gaps with current baseline and target from {test_artifacts}/nfr-assessment.md</action>
+  <action>If {planning_artifacts}/prd.md already exists: WARN user — "A PRD already exists. Continuing will overwrite it with brownfield gap content. Choose: (a) overwrite, (b) save as prd-brownfield-gaps.md instead." If user chooses (b), adjust template-output path accordingly.</action>
   <template-output file="{planning_artifacts}/prd.md">
     Generate a PRD following the standard template structure. Add "Mode: Brownfield — gaps only" to the header. All sections must follow the template format but contain only gap-focused content. NFR section must include "Current Baseline" and "Target" columns with real values from {test_artifacts}/nfr-assessment.md. Include a Priority Matrix section mapping each gap to priority/effort/impact.
   </template-output>
@@ -143,7 +144,6 @@
   <ask>Open a new Claude Code terminal and run /gaia-create-arch to generate the brownfield architecture document (as-is C4 diagrams + target for gaps + delta table + migration strategy). It auto-detects brownfield mode from the PRD header. Confirm here once it completes. (ok)</ask>
   <ask>Open a new Claude Code terminal and run /gaia-create-epics to generate gap-only stories with risk levels, dependency topology, and priority ordering. This will also generate the brownfield-onboarding.md knowledge base. Confirm here once it completes. (ok)</ask>
 </step>
-
 <next-step command="/gaia-readiness-check">
   Run /gaia-readiness-check in the Claude Code terminal to validate implementation readiness before starting development.
 </next-step>
