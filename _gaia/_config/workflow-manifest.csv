@@ -58,6 +58,6 @@ name,displayName,description,module,phase,path,command,agent
 "epic-status","Epic Status","Show epic completion dashboard across all sprints","lifecycle","4-implementation","_gaia/lifecycle/workflows/4-implementation/epic-status/workflow.yaml","gaia-epic-status","sm"
 "triage-findings","Triage Findings","Triage development findings into backlog stories","lifecycle","4-implementation","_gaia/lifecycle/workflows/4-implementation/triage-findings/workflow.yaml","gaia-triage-findings","sm"
 "creative-sprint","Creative Sprint","Multi-agent creative pipeline: empathize → solve → innovate","creative","anytime","_gaia/creative/workflows/creative-sprint/workflow.yaml","gaia-creative-sprint","orchestrator"
-"change-request","Change Request","Triage and route change requests","lifecycle","4-implementation","_gaia/lifecycle/workflows/4-implementation/change-request/workflow.yaml","gaia-change-request","pm"
+"change-request","Change Request","Impact-driven change request with analysis and cascade updates","lifecycle","4-implementation","_gaia/lifecycle/workflows/4-implementation/change-request/workflow.yaml","gaia-change-request","pm"
 "add-stories","Add Stories","Add incremental stories to existing epics","lifecycle","4-implementation","_gaia/lifecycle/workflows/4-implementation/add-stories/workflow.yaml","gaia-add-stories","pm"
 "tech-debt-review","Tech Debt Review","Aggregate and prioritize technical debt","lifecycle","4-implementation","_gaia/lifecycle/workflows/4-implementation/tech-debt-review/workflow.yaml","gaia-tech-debt-review","sm"

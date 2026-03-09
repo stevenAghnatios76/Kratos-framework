@@ -1,5 +1,5 @@
 name: change-request
-description: 'Triage and route change requests during active development'
+description: 'Impact-driven change request with analysis, approval gate, and cascade updates'
 module: lifecycle
 agent: pm
 config_resolved: "{project-root}/_gaia/lifecycle/.resolved/change-request.yaml"
@@ -17,8 +17,21 @@ input_file_patterns:
   epics:
     whole: "{planning_artifacts}/epics-and-stories.md"
     load_strategy: "SELECTIVE_LOAD"
+  sprint_status:
+    whole: "{implementation_artifacts}/sprint-status.yaml"
+    load_strategy: "FULL_LOAD"
+  test_plan:
+    whole: "{test_artifacts}/test-plan.md"
+    load_strategy: "SELECTIVE_LOAD"
+  traceability:
+    whole: "{test_artifacts}/traceability-matrix.md"
+    load_strategy: "SELECTIVE_LOAD"
+quality_gates:
+  pre_start:
+    - check: "prd.md exists"
+      on_fail: "halt — no PRD to assess impact against. Run /gaia-create-prd first."
 on_error:
-  missing_file: "ask_user"
+  missing_file: "skip_and_note"
   unresolved_variable: "halt"
 
 output:

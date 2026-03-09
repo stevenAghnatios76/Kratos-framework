@@ -73,6 +73,6 @@ module,phase,name,code,command,required,agent-name,description,output-location
 "testing","anytime","mobile-testing","mobile-testing","gaia-mobile-testing","false","test-architect","Create mobile test plan covering devices and responsive","docs/test-artifacts"
 "creative","anytime","creative-sprint","creative-sprint","gaia-creative-sprint","false","orchestrator","Multi-agent creative pipeline: empathize → solve → innovate","docs/creative-artifacts"
 "core","anytime","validate-framework","validate-framework","gaia-validate-framework","false","orchestrator","Run GAIA framework self-validation","n/a"
-"lifecycle","4-implementation","change-request","change-request","gaia-change-request","false","pm","Triage and route change requests during active development","docs/planning-artifacts"
+"lifecycle","4-implementation","change-request","change-request","gaia-change-request","false","pm","Impact-driven change request with analysis, approval gate, and cascade updates","docs/planning-artifacts"
 "lifecycle","4-implementation","add-stories","add-stories","gaia-add-stories","false","pm","Add incremental stories to existing epics-and-stories.md","docs/planning-artifacts"
 "lifecycle","4-implementation","tech-debt-review","tech-debt-review","gaia-tech-debt-review","false","sm","Aggregate, classify, and prioritize technical debt","docs/implementation-artifacts"

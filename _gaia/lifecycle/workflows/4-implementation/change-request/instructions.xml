@@ -1,54 +1,123 @@
 <workflow name="change-request">
 <critical>
-  <mandate>Every change request must be documented with a CR ID before any work begins</mandate>
-  <mandate>Classification determines the path — do not skip classification</mandate>
+  <mandate>Every change request must have a formal impact analysis before any artifact updates begin</mandate>
+  <mandate>User must APPROVE the change after reviewing impact analysis — this is a hard gate</mandate>
+  <mandate>Cascade updates to downstream artifacts via subagents after approval</mandate>
 </critical>
 
 <step n="1" title="Capture Change Request">
   <ask>Describe the change request: What needs to change and why?</ask>
-  <ask>Is this driven by: user feedback, stakeholder request, technical discovery, or market shift?</ask>
-  <action>Assign CR ID: CR-{date}-{seq} (e.g., CR-2026-03-07-1)</action>
+  <ask>What is driving this change? (user feedback / stakeholder request / technical discovery / market shift / regulatory)</ask>
+  <ask>Urgency level? (critical — blocks current sprint / high — next sprint / normal — backlog)</ask>
+  <action>Assign CR ID: CR-{date}-{seq} (e.g., CR-2026-03-09-1). Check {planning_artifacts}/ for existing CR files to determine next sequence number.</action>
 </step>
 
-<step n="2" title="Load Current State">
-  <action>Read {planning_artifacts}/prd.md — scan section headers and feature list</action>
-  <action>Read {planning_artifacts}/architecture.md — scan component list and tech stack</action>
-  <action>Read {planning_artifacts}/epics-and-stories.md — scan epic/story list</action>
-  <action>Read {implementation_artifacts}/sprint-status.yaml — check current sprint state</action>
+<step n="2" title="Load All Artifacts">
+  <action>Read {planning_artifacts}/prd.md — extract requirement IDs (FR-*, NFR-*), feature section headers, user personas, NFR targets</action>
+  <action>Read {planning_artifacts}/architecture.md — extract component list, API endpoints, data models, ADR references, tech stack</action>
+  <action>Read {planning_artifacts}/epics-and-stories.md — extract all story IDs, statuses, dependencies, sizes, risk levels</action>
+  <action>Read {implementation_artifacts}/sprint-status.yaml — current sprint ID, story statuses, velocity used vs available</action>
+  <action>Read {test_artifacts}/test-plan.md if exists — extract risk areas and high-risk components</action>
+  <action>Read {test_artifacts}/traceability-matrix.md if exists — extract requirement-to-test coverage mappings</action>
+  <action>Note any missing artifacts as INFO — they limit analysis depth but do not block the workflow</action>
 </step>
 
-<step n="3" title="Classify Impact">
-  <action>Assess against three criteria:</action>
-  <action>1. SCOPE: How many files affected? &lt;5 = small, 5-15 = medium, &gt;15 = large</action>
-  <action>2. ARTIFACT IMPACT:</action>
-  <action>   - None (cosmetic/config) → QUICK</action>
-  <action>   - PRD only (new requirement, no arch change) → PRD-ONLY</action>
-  <action>   - PRD + Architecture (new component, API change, tech decision) → PRD+ARCH</action>
-  <action>   - PRD + Architecture + new epic → FULL</action>
-  <action>3. SPRINT IMPACT: Current sprint can absorb, or needs next sprint?</action>
-  <action>Present classification to user for confirmation</action>
+<step n="3" title="Requirements Impact Analysis">
+  <action>Analyze the change against PRD content:</action>
+  <action>— Identify PRD sections affected (features, personas, user journeys, NFRs, constraints)</action>
+  <action>— List requirement IDs (FR-*, NFR-*) that need modification, addition, or removal</action>
+  <action>— Assess NFR impact: does this change performance, security, scalability, or availability targets?</action>
+  <action>— Identify user journeys affected — which personas and flows change?</action>
+  <action>Classify requirements_impact: NONE (no PRD changes) / MINOR (wording, clarification) / SIGNIFICANT (new requirements, modified scope) / BREAKING (removes or contradicts existing requirements)</action>
 </step>
 
-<step n="4" title="Route Decision">
-  <action>Based on classification, recommend path:</action>
-  <action>QUICK: → /gaia-quick-spec → /gaia-quick-dev. No artifact updates.</action>
-  <action>PRD-ONLY: → /gaia-edit-prd. Architecture check optional.</action>
-  <action>PRD+ARCH: → /gaia-edit-prd → update architecture → /gaia-adversarial on architecture.md → /gaia-add-stories → /gaia-correct-course.</action>
-  <action>FULL: → /gaia-edit-prd → architecture update + adversarial → /gaia-add-stories (new epic) → /gaia-correct-course.</action>
-  <action>Get user confirmation on the recommended path.</action>
+<step n="4" title="Technical Impact Analysis">
+  <action>Analyze the change against architecture:</action>
+  <action>— Identify architecture components affected (services, modules, layers)</action>
+  <action>— Assess API changes: new endpoints, modified contracts, breaking changes, versioning impact</action>
+  <action>— Assess data model changes: schema migrations needed, new entities, modified relationships</action>
+  <action>— Identify infrastructure impact: new services, scaling changes, deployment topology</action>
+  <action>— Check ADR implications: existing decisions invalidated? New architectural decisions needed?</action>
+  <action>Classify technical_impact: NONE / MINOR (config, minor refactor) / SIGNIFICANT (new component, API change) / BREAKING (architectural shift, tech stack change)</action>
 </step>
 
-<step n="5" title="Generate Change Request Record">
+<step n="5" title="Sprint and Effort Impact Analysis">
+  <action>Analyze the change against current sprint and stories:</action>
+  <action>— Identify existing stories directly affected (scope changes, new blockers, invalidated acceptance criteria)</action>
+  <action>— If stories in 'in-progress' or 'review' are affected: flag as HIGH_RISK — these may need rework</action>
+  <action>— Estimate new stories needed: count and size (S=1pt, M=3pt, L=5pt, XL=8pt)</action>
+  <action>— Calculate total effort: sum of new story points + rework estimate for affected existing stories</action>
+  <action>— Assess sprint absorption: compare effort against remaining sprint velocity capacity</action>
+  <action>Classify sprint_impact: ABSORBABLE (fits in current sprint) / NEXT_SPRINT (defer to next sprint) / MULTI_SPRINT (requires multiple sprints)</action>
+  <action>If traceability-matrix.md exists: flag test coverage gaps that this change will create</action>
+</step>
+
+<step n="6" title="Impact Summary and Approval Gate">
+  <action>Present consolidated impact analysis:
+
+  **Change Request: {cr_id}**
+  | Dimension | Impact Level | Details |
+  |-----------|-------------|---------|
+  | Requirements | {requirements_impact} | {affected PRD sections and requirement IDs} |
+  | Technical | {technical_impact} | {affected components, APIs, data models} |
+  | Sprint/Effort | {sprint_impact} | {story points estimate, sprint absorption capacity} |
+
+  **Artifacts to be modified:**
+  - {list each artifact and what will change}
+
+  **New artifacts to be created:**
+  - {list new stories, ADRs, etc.}
+
+  **Risk flags:**
+  - {HIGH_RISK stories, breaking changes, test coverage gaps}
+  </action>
+  <ask>Review the impact analysis above. Do you APPROVE or REJECT this change request?</ask>
+  <check if="user_rejects">Set cr_status = REJECTED. Skip steps 7-9 — proceed directly to step 10 to generate the CR record.</check>
+  <check if="user_approves">Set cr_status = APPROVED. Proceed with artifact cascade updates.</check>
+</step>
+
+<step n="7" title="Update PRD" optional="true" condition="requirements_impact != NONE AND cr_status == APPROVED">
+  <action>Skip if requirements_impact = NONE.</action>
+  <action>Spawn a subagent using the Agent tool: "Load {project-root}/_gaia/core/engine/workflow.xml, then process {project-root}/_gaia/lifecycle/workflows/2-planning/edit-prd/workflow.yaml as workflow-config. Run in YOLO mode. Follow the workflow engine instructions EXACTLY. Context: This is change request {cr_id}. Apply these changes to the PRD: {change_description}. Use CR ID {cr_id} when prompted."</action>
+  <action>When subagent returns: verify prd.md version note references {cr_id}. Record: prd_updated = true.</action>
+</step>
+
+<step n="8" title="Update Architecture" optional="true" condition="technical_impact != NONE AND cr_status == APPROVED">
+  <action>Skip if technical_impact = NONE.</action>
+  <action>If technical_impact = MINOR: flag for manual architecture review — "Run /gaia-adversarial targeting architecture.md after making manual updates."</action>
+  <action>If technical_impact = SIGNIFICANT or BREAKING: spawn a subagent using the Agent tool: "Load {project-root}/_gaia/core/tasks/review-adversarial.xml. Read its entire contents. Target: {planning_artifacts}/architecture.md. Follow the task instructions EXACTLY." When subagent returns: verify adversarial-review-{date}.md exists.</action>
+  <action>Record: architecture_reviewed = true, manual_update_needed = {true if SIGNIFICANT/BREAKING}.</action>
+  <action>If manual_update_needed: inform user — "Architecture needs manual updates for this change. Run /gaia-create-arch to revise, then re-run adversarial review."</action>
+</step>
+
+<step n="9" title="Update Stories" optional="true" condition="new_stories_needed OR existing_stories_affected AND cr_status == APPROVED">
+  <action>Skip if no new stories needed AND no existing stories affected.</action>
+  <action>If new stories needed: spawn a subagent using the Agent tool: "Load {project-root}/_gaia/core/engine/workflow.xml, then process {project-root}/_gaia/lifecycle/workflows/4-implementation/add-stories/workflow.yaml as workflow-config. Run in YOLO mode. Follow the workflow engine instructions EXACTLY. Context: Adding stories for change request {cr_id}. Requirements: {new_story_descriptions}."</action>
+  <action>When subagent returns: verify epics-and-stories.md has new stories with Source: {cr_id}. Record: stories_added = {count}.</action>
+  <action>If existing stories need scope changes: list affected stories with what needs to change — flag for manual update via /gaia-fix-story.</action>
+  <action>If sprint injection needed: inform user — "Run /gaia-correct-course with CR ID {cr_id} to inject new stories into current sprint."</action>
+</step>
+
+<step n="10" title="Generate Change Request Record">
   <template-output file="{planning_artifacts}/change-request-{cr_id}.md">
-    Generate change request document with: CR ID, date, source, description,
-    classification (QUICK/PRD-ONLY/PRD+ARCH/FULL), artifact impact, sprint impact,
-    recommended execution path (ordered /gaia commands), status: OPEN.
+    Generate change request document with YAML frontmatter:
+    ---
+    cr_id: "{cr_id}"
+    date: "{date}"
+    status: "{APPROVED|REJECTED}"
+    urgency: "{critical|high|normal}"
+    driver: "{source}"
+    requirements_impact: "{NONE|MINOR|SIGNIFICANT|BREAKING}"
+    technical_impact: "{NONE|MINOR|SIGNIFICANT|BREAKING}"
+    sprint_impact: "{ABSORBABLE|NEXT_SPRINT|MULTI_SPRINT}"
+    effort_estimate_points: {number}
+    ---
+    Then detailed sections: Change Description, Impact Analysis (requirements, technical, sprint),
+    Affected Artifacts (what changed, what still needs manual update), Stories Created/Modified,
+    Cascade Status (completed updates vs pending), and Recommended Next Actions.
+    If REJECTED: include rejection reason and impact analysis for future reference.
   </template-output>
-</step>
-
-<step n="6" title="Next Steps">
-  <action>Present the recommended command sequence to the user</action>
-  <action>If QUICK: "Run /gaia-quick-spec now"</action>
-  <action>If PRD-ONLY or higher: "Run /gaia-edit-prd now"</action>
+  <action>If cr_status == APPROVED and stories were added: recommend "/gaia-correct-course with CR ID {cr_id}" or "/gaia-create-story {story_key}" as next steps.</action>
+  <action>If cr_status == APPROVED and manual architecture update needed: recommend "/gaia-create-arch to revise architecture".</action>
 </step>
 </workflow>
