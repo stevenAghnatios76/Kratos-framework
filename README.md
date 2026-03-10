@@ -1,114 +1,63 @@
 # GAIA — Generative Agile Intelligence Architecture
 
-> **WARNING: This framework is currently in BETA. Workflows, commands, and APIs may change without notice. Use in production at your own risk.**
+[![Framework](https://img.shields.io/badge/framework-v1.27.1-blue)]()
+[![License](https://img.shields.io/badge/license-AGPL--3.0-green)]()
+[![Agents](https://img.shields.io/badge/agents-25-purple)]()
+[![Workflows](https://img.shields.io/badge/workflows-64-orange)]()
 
-AI agent framework for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that orchestrates software product development through 25 specialized agents, 62 workflows, and 8 shared skills — from initial research all the way to deployment.
+AI agent framework for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that orchestrates software product development through **25 specialized agents**, **64 workflows**, and **8 shared skills** — from initial research all the way to deployment.
 
-GAIA gives you a team of AI agents with distinct personas, structured workflows that follow a proven product lifecycle, built-in quality gates, checkpoint/resume for long-running sessions, and persistent agent memory across conversations.
+![GAIA Lifecycle Activity Diagram](GAIA_v1.27.0_Lifecycle_Activity_Diagram.png)
 
----
+### Why GAIA?
 
-## Installation
+Using Claude Code alone, you prompt an AI assistant. With GAIA, you manage a **team of AI specialists** that follow a proven product lifecycle:
 
-### Using npx (recommended)
-
-```bash
-npx gaia-framework init .
-```
-
-This clones the latest GAIA release from GitHub and installs it into the current directory.
-
-```bash
-# Install into a new project
-npx gaia-framework init ~/my-new-project
-
-# Skip interactive prompts (uses defaults)
-npx gaia-framework init --yes ~/my-project
-```
-
-**Requirements:** Node.js 18+ and git.
-
-### Using the shell script directly
-
-```bash
-# Clone the repo
-git clone https://github.com/J-louage/Gaia-framework.git
-
-# Install into your project
-bash Gaia-framework/gaia-install.sh init ~/my-project
-
-# Or use a local copy as source
-bash gaia-install.sh init --source ~/Gaia-framework ~/my-project
-```
-
-The script resolves sources in this order: `--source` flag, `$GAIA_SOURCE` env var, script's own directory, GitHub clone.
-
-### What the installer does
-
-1. Copies the `_gaia/` framework into your project
-2. Creates `docs/` artifact directories (planning, implementation, test, creative)
-3. Creates memory sidecar directories with `.gitkeep` files
-4. Creates `.resolved/` directories for pre-built configs
-5. Prompts for project name and user name, writes them to `global.yaml`
-6. Copies `CLAUDE.md` to your project root (the framework instruction file)
-7. Installs 101 slash commands to `.claude/commands/`
-8. Appends GAIA entries to `.gitignore`
-
-### Updating an existing installation
-
-```bash
-# Via npx
-npx gaia-framework update .
-
-# Via shell script
-bash gaia-install.sh update ~/my-project
-```
-
-Update refreshes all framework files (engine, agents, workflows, skills, knowledge, commands) while preserving your `global.yaml` configuration, agent memory, resolved configs, and `CLAUDE.md`.
-
-Changed files are backed up to `_gaia/_backups/{timestamp}/` before overwriting.
-
-### Validating and checking status
-
-```bash
-# Check installation integrity (32 checks)
-npx gaia-framework validate .
-
-# Show version, module list, command count, sidecar status
-npx gaia-framework status .
-```
-
-### Installer options
-
-```
-gaia-install.sh <command> [options] [target]
-
-Commands:
-  init       Install GAIA into a project
-  update     Update framework files (preserves config and memory)
-  validate   Check installation integrity
-  status     Show installation info
-
-Options:
-  --source <path>   Local GAIA source directory
-  --yes             Skip confirmation prompts
-  --dry-run         Show what would be done without making changes
-  --verbose         Show detailed progress
-  --help            Show help
-```
+- **Structured lifecycle** — 5 phases from analysis to deployment, with quality gates that enforce standards at every transition
+- **25 specialized agents** — each with a persona, domain expertise, and persistent memory that improves over time
+- **Built-in quality gates** — 17 enforced gates that HALT workflows when standards aren't met (not advisory — hard stops)
+- **6-gate review process** — every story passes code review, QA, security, test automation, test review, and performance review before completion
+- **Checkpoint/resume** — long-running workflows survive context loss with sha256-verified checkpoints
+- **Brownfield support** — onboard existing codebases with automated discovery, documentation generation, and gap analysis
 
 ---
 
-## Getting Started
+## Prerequisites
 
-After installation, open your project in Claude Code:
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (requires Anthropic account)
+- Node.js 18+
+- Git
+
+---
+
+## Quick Start
 
 ```bash
-cd ~/my-project
-claude
+# Install GAIA into your project
+npx gaia-framework init ~/my-project
+
+# Open in Claude Code
+cd ~/my-project && claude
+
+# Generate pre-resolved configs (one-time setup)
+/gaia-build-configs
 ```
 
-Then type `/gaia` to launch the orchestrator. Gaia presents a categorized menu and routes you to the right agent or workflow.
+Then try your first workflow:
+
+```bash
+# Describe a small feature and get a tech spec in 30 seconds
+/gaia-quick-spec
+
+# Implement it immediately
+/gaia-quick-dev
+```
+
+Or launch the orchestrator to explore all capabilities:
+
+```bash
+/gaia
+```
 
 ### 5 essential commands
 
@@ -120,75 +69,97 @@ Then type `/gaia` to launch the orchestrator. Gaia presents a categorized menu a
 | `/gaia-quick-dev` | Implement a quick spec |
 | `/gaia-help` | Context-sensitive help for wherever you are |
 
-### First-time setup
+---
 
-After installing GAIA into your project, run `/gaia-build-configs` to generate pre-resolved configuration files. This speeds up every future workflow activation by eliminating runtime config resolution.
+## Installation
+
+### Using npx (recommended)
+
+```bash
+npx gaia-framework init .
+```
+
+```bash
+# Install into a specific directory
+npx gaia-framework init ~/my-new-project
+
+# Skip interactive prompts
+npx gaia-framework init --yes ~/my-project
+```
+
+### Using the shell script
+
+```bash
+git clone https://github.com/J-louage/Gaia-framework.git
+bash Gaia-framework/gaia-install.sh init ~/my-project
+```
+
+### What the installer does
+
+1. Copies the `_gaia/` framework into your project
+2. Creates `docs/` artifact directories (planning, implementation, test, creative)
+3. Creates memory sidecar directories
+4. Prompts for project name and user name → writes to `global.yaml`
+5. Copies `CLAUDE.md` to your project root
+6. Installs 104 slash commands to `.claude/commands/`
+7. Appends GAIA entries to `.gitignore`
+
+### Updating
+
+```bash
+npx gaia-framework update .
+```
+
+Update refreshes all framework files while preserving your configuration, agent memory, and `CLAUDE.md`. Changed files are backed up to `_gaia/_backups/{timestamp}/`.
+
+### Validating
+
+```bash
+npx gaia-framework validate .   # 32 integrity checks
+npx gaia-framework status .     # version, module list, command count
+```
 
 ---
 
-## Architecture
+## How It Works
+
+### 5-phase product lifecycle
 
 ```
-_gaia/
-├── _config/              # Global config, manifests, agent registry
-│   ├── global.yaml       # Project settings — single source of truth
-│   └── manifest.yaml     # Module registry
-├── _memory/              # Persistent agent memory + checkpoints
-│   ├── checkpoints/      # Workflow progress snapshots
-│   └── *-sidecar/        # Per-agent persistent memory (9 sidecars)
-├── core/                 # Execution engine, protocols, shared tasks
-│   ├── engine/           # workflow.xml, task-runner.xml, error-recovery.xml
-│   ├── tasks/            # 16 standalone review/utility tasks
-│   └── workflows/        # Brainstorming, party mode, advanced elicitation
-├── lifecycle/            # Product lifecycle (5 phases)
-│   ├── agents/           # 11 lifecycle agents
-│   ├── workflows/        # 36 workflows across 5 phases + anytime + quick-flow
-│   ├── templates/        # 16 document templates (PRD, architecture, API docs, brownfield, etc.)
-│   └── teams/            # Pre-built team compositions
-├── dev/                  # Developer tooling
-│   ├── agents/           # 6 stack-specific developers + base
-│   ├── skills/           # 8 shared skills with sectioned loading
-│   └── knowledge/        # Stack-specific patterns (Angular, React, Flutter, etc.)
-├── creative/             # Creative intelligence
-│   ├── agents/           # 6 creative agents
-│   ├── workflows/        # 7 creative workflows
-│   └── data/             # Methods, frameworks, story types
-└── testing/              # Test architecture
-    ├── agents/           # Test Architect (Sable)
-    ├── workflows/        # 12 testing workflows
-    └── knowledge/        # 20+ testing knowledge fragments
+Phase 1: Analysis → Phase 2: Planning → Phase 3: Solutioning → Phase 4: Implementation → Phase 5: Deployment
+   (Elena)           (Derek/Christy)      (Theo/Zara/Soren)      (Nate/Dev Agents)        (Soren)
 ```
 
-### At a glance
+Every phase has **quality gates** — enforced checks that halt the workflow if prerequisites aren't met. You can't create an architecture without a reviewed PRD. You can't start a sprint without a readiness check. You can't deploy without passing all reviews.
 
-| Component | Count |
-|-----------|-------|
-| Modules | 5 (core, lifecycle, dev, creative, testing) |
-| Agents | 25 with distinct personas |
-| Workflows | 59 covering the full product lifecycle |
-| Standalone tasks | 16 (reviews, audits, utilities) |
-| Shared skills | 8 with 47 loadable sections |
-| Slash commands | 100 |
-| Knowledge fragments | 45 (testing, stack patterns) |
-| Agent memory sidecars | 9 |
-| Output artifact dirs | 4 |
+### Entry points
+
+| Path | Command | When to use |
+|------|---------|-------------|
+| New project | Start at Phase 1 | Greenfield — building from scratch |
+| Existing project | `/gaia-brownfield` | Brownfield — onboarding existing codebase |
+| Small change | `/gaia-quick-spec` | Under 5 files, under 1 day |
+| Resume | `/gaia-resume` | Continue after context loss |
+
+### Model assignment
+
+Each command declares which Claude model to use. **Opus** handles deep reasoning, architectural decisions, and complex analysis (27 commands). **Sonnet** handles structured generation, template-following, and status reporting (77 commands). Claude Code auto-selects the model per workflow.
+
+### Execution modes
+
+Workflows support three modes: **normal** (pauses for confirmation at each checkpoint), **YOLO** (auto-proceeds without pausing), and **planning** (presents a structured execution plan for approval before any steps run). You can switch between normal and YOLO mid-workflow.
 
 ---
 
 ## Agents
 
-Every agent has a name, persona, and specialization. You can activate any agent directly with `/gaia-agent-{name}` or let the orchestrator route you.
-
-### Orchestrator
-
-| Agent | Name | Role |
-|-------|------|------|
-| Orchestrator | Gaia | Routes requests, manages resources, presents categorized menus |
+Every agent has a name, persona, and specialization. Activate any agent directly with `/gaia-agent-{name}` or let the orchestrator route you.
 
 ### Lifecycle Agents
 
 | Agent | Name | Specialization | Command |
 |-------|------|---------------|---------|
+| Orchestrator | Gaia | Routes requests, manages resources | `/gaia` |
 | Business Analyst | Elena | Market research, domain analysis, product briefs | `/gaia-agent-analyst` |
 | Product Manager | Derek | PRDs, requirements, stakeholder alignment | `/gaia-agent-pm` |
 | UX Designer | Christy | User research, interaction design, UI patterns | `/gaia-agent-ux-designer` |
@@ -236,10 +207,6 @@ All developer agents extend a shared base with common dev patterns. Each adds st
 ## Workflows
 
 Workflows are structured multi-step processes. Each has a `workflow.yaml` config, `instructions.xml` with step-by-step guidance, and a `checklist.md` for quality gates.
-
-### Model Assignment
-
-Each command specifies which Claude model to use. **Opus** is assigned to workflows requiring deep reasoning, multi-step synthesis, or complex analysis. **Sonnet** is assigned to structured generation, template-following, and status reporting tasks.
 
 ### Phase 1: Analysis
 
@@ -302,8 +269,6 @@ Each command specifies which Claude model to use. **Opus** is assigned to workfl
 
 ### Quick Flow
 
-Fast-track workflows for small changes that skip the full lifecycle ceremony.
-
 | Command | Workflow | Model | Description |
 |---------|----------|-------|-------------|
 | `/gaia-quick-spec` | Quick Spec | Sonnet | Rapid tech spec — skip full PRD |
@@ -323,16 +288,7 @@ Fast-track workflows for small changes that skip the full lifecycle ceremony.
 
 ### Testing Workflows
 
-Testing workflows are **integrated into the main lifecycle** — they are not optional standalone tools. Key integration points:
-
-| Lifecycle Point | Required Testing Workflow | Gate Type |
-|---|---|---|
-| After `/gaia-create-arch` | `/gaia-test-design` | HALT at `/gaia-create-epics` |
-| After `/gaia-test-design` | `/gaia-test-framework` (optional) | Prompted if no framework detected |
-| Before `/gaia-dev-story` (high-risk) | `/gaia-atdd` | HALT (conditional on risk_level) |
-| Before `/gaia-readiness-check` | `/gaia-trace` + `/gaia-ci-setup` | HALT |
-| During `/gaia-brownfield` | `/gaia-nfr` + `/gaia-perf-testing` | REQUIRED steps |
-| Before `/gaia-deploy-checklist` | traceability + CI + readiness PASS | HALT |
+Testing workflows are **integrated into the main lifecycle** — they are not optional standalone tools.
 
 | Command | Workflow | Agent | Model | Output |
 |---------|----------|-------|-------|--------|
@@ -351,8 +307,6 @@ Testing workflows are **integrated into the main lifecycle** — they are not op
 
 ### Anytime Workflows
 
-Available at any point in the lifecycle.
-
 | Command | Workflow | Model | Description |
 |---------|----------|-------|-------------|
 | `/gaia-brownfield` | Brownfield Onboarding | Opus | 6-step orchestration with subagents for existing projects |
@@ -362,417 +316,158 @@ Available at any point in the lifecycle.
 | `/gaia-brainstorming` | Brainstorming | Sonnet | Facilitated brainstorming session |
 | `/gaia-party` | Party Mode | Sonnet | Multi-agent group discussion |
 | `/gaia-advanced-elicitation` | Advanced Elicitation | Opus | Deep requirements elicitation |
-| `/gaia-memory-hygiene` | Memory Hygiene | Sonnet | Detect stale or contradicted decisions in agent memory sidecars |
+| `/gaia-memory-hygiene` | Memory Hygiene | Sonnet | Detect stale decisions in agent memory |
 
-### Brownfield Onboarding (Deep Dive)
-
-The brownfield onboarding workflow (`/gaia-brownfield`) is a comprehensive 9-step process that transforms an existing codebase into a fully documented developer knowledge base. It detects project capabilities during scanning and conditionally generates specialized documentation.
-
-**Step 1 — Deep Project Discovery** scans the codebase and sets capability flags:
-
-| Flag | Detection |
-|------|-----------|
-| `{has_apis}` | Route definitions, controllers, OpenAPI/Swagger specs |
-| `{has_events}` | Kafka, RabbitMQ, SNS-SQS, Redis pub-sub, NATS patterns |
-| `{has_external_deps}` | Outbound HTTP clients, SDKs, service URLs |
-| `{has_frontend}` | React, Angular, Vue, Flutter, SwiftUI, CSS frameworks |
-
-**Steps 2–4** are conditional — they only run when the corresponding capability is detected:
-
-| Step | Condition | Output |
-|------|-----------|--------|
-| 2. API Documentation | `{has_apis}` | OpenAPI 3.x spec (discovered or generated), endpoint inventory, Mermaid flow diagram |
-| 3. UX Design Assessment | `{has_frontend}` | UI patterns, Mermaid navigation sitemap, accessibility assessment, UX gaps |
-| 4. Event & Messaging Catalog | `{has_events}` | Producer/consumer tables, delivery guarantees, Mermaid event flow diagrams |
-
-**Steps 5–10** always run:
-
-| Step | Output |
-|------|--------|
-| 5. Dependency Map | External services, infrastructure, library deps with CVE risk, Mermaid dependency graph |
-| 6. NFR Assessment & Baselines | Code quality, security posture, performance, test coverage — output to `test-artifacts/nfr-assessment.md` (canonical) |
-| 7. Performance Test Plan | Performance budgets, load test scenarios, Core Web Vitals targets — output to `test-artifacts/` (**REQUIRED**) |
-| 8. Create PRD for Gaps | Gap-focused PRD with NFR baselines from step 6, references all upstream artifacts |
-| 9. Map Architecture with Diagrams | C4 Mermaid diagrams (Level 1 + 2), 3–5 sequence diagrams, as-is/target delta |
-| 10. Epics/Stories & Onboard Developer | Gap stories + developer knowledge base index linking all artifacts |
-
-**Design rules:**
-- All diagrams use **Mermaid syntax** — no ASCII art
-- All API docs use **Swagger/OpenAPI format**
-- Flow diagrams limited to **3–5 key flows** per document
-- NFR baselines are **measured from the codebase**, not estimated
-
-**Output artifacts** (up to 11, depending on detected capabilities):
-
-| Artifact | Location | Always | Conditional |
-|----------|----------|--------|-------------|
-| `project-documentation.md` | `planning-artifacts/` | Yes | — |
-| `api-documentation.md` | `planning-artifacts/` | — | `{has_apis}` |
-| `ux-design.md` | `planning-artifacts/` | — | `{has_frontend}` |
-| `event-catalog.md` | `planning-artifacts/` | — | `{has_events}` |
-| `dependency-map.md` | `planning-artifacts/` | Yes | — |
-| `nfr-assessment.md` | `test-artifacts/` | Yes | — |
-| `performance-test-plan-{date}.md` | `test-artifacts/` | Yes | — |
-| `prd.md` | `planning-artifacts/` | Yes | — |
-| `architecture.md` | `planning-artifacts/` | Yes | — |
-| `epics-and-stories.md` | `planning-artifacts/` | Yes | — |
-| `brownfield-onboarding.md` | `planning-artifacts/` | Yes | — |
-
----
-
-## Review & Utility Tasks
-
-Standalone tasks that can be run anytime without a full workflow. These are single-step operations for reviews, audits, and document utilities.
-
-### Code & Security Reviews
+### Review & Utility Tasks
 
 | Command | Task | Model | Description |
 |---------|------|-------|-------------|
-| `/gaia-adversarial` | Adversarial Review | Opus | Cynical critical review — finds weaknesses |
+| `/gaia-adversarial` | Adversarial Review | Opus | Cynical critical review from 10 perspectives — finds weaknesses |
 | `/gaia-edge-cases` | Edge Case Hunter | Opus | Identify edge cases and boundary conditions |
 | `/gaia-review-security` | Security Review | Opus | OWASP-focused security review |
 | `/gaia-review-api` | API Design Review | Opus | Review REST API against standards |
 | `/gaia-review-deps` | Dependency Audit | Sonnet | Scan dependencies for vulnerabilities |
 | `/gaia-review-a11y` | Accessibility Review | Sonnet | WCAG 2.1 compliance review |
 | `/gaia-review-perf` | Performance Review | Opus | Code-level performance review |
+| `/gaia-editorial-prose` | Editorial Prose | Sonnet | Clinical copy-editing review |
+| `/gaia-editorial-structure` | Editorial Structure | Sonnet | Structural editing review |
+| `/gaia-summarize` | Summarize Document | Sonnet | Generate executive summary |
+| `/gaia-index-docs` | Index Docs | Sonnet | Generate document index for a folder |
+| `/gaia-shard-doc` | Shard Document | Sonnet | Split large docs into sections |
+| `/gaia-merge-docs` | Merge Documents | Sonnet | Merge multiple markdown files |
+| `/gaia-changelog` | Generate Changelog | Sonnet | Changelog from git history |
 
-### Adversarial Review (`/gaia-adversarial`)
+### Framework Utilities
 
-The adversarial review is a cynical, critical examination designed to find flaws, gaps, and weaknesses in any document or design. It deliberately assumes nothing works as claimed and attacks from **10 different perspectives**:
-
-| Perspective | What it challenges |
-|---|---|
-| **Feasibility** | Can this actually be built as described? |
-| **Completeness** | What's missing that should be there? |
-| **Contradictions** | Do any sections contradict each other? |
-| **Assumptions** | What unstated assumptions could be wrong? |
-| **Scale** | Will this work at 10x/100x expected load? |
-| **Failure modes** | What happens when things go wrong? |
-| **Dependencies** | What external factors could break this? |
-| **Security** | What attack surfaces are exposed? |
-| **User impact** | Where will users get confused or frustrated? |
-| **Business risk** | What could make this commercially unviable? |
-
-**Output:** A ranked findings report with severity (critical/high/medium/low), confidence (certain/likely/possible), a threat summary of the top 3 issues, and an overall risk assessment. The review only identifies problems — it does not suggest fixes.
-
-**When to use it:** The adversarial review is integrated as an optional prompt at 4 key lifecycle points:
-
-| Trigger Point | When Prompted | Recommended For |
-|---|---|---|
-| After `/gaia-create-prd` | End of PRD creation (step 11) | Complex or high-stakes products |
-| After `/gaia-create-arch` | End of architecture design (step 9) | Distributed systems, high-scale projects |
-| After `/gaia-create-epics` | End of epic/story creation (step 8) | Before sprint planning |
-| After `/gaia-readiness-check` | End of readiness check (step 9) | Strongly recommended — last chance before build |
-
-At each point you can accept or skip. It can also be run independently anytime with `/gaia-adversarial` on any artifact.
-
-### Lifecycle-Integrated Reviews
-
-In addition to the adversarial review, several other tasks are integrated into the lifecycle at natural trigger points:
-
-**Review Gate members** (required — story cannot move to `done` without all 6 passing):
-
-| Review Command | Gate Row | Verdict | What It Checks |
-|---|---|---|---|
-| `/gaia-code-review` | Code Review | APPROVE / REQUEST_CHANGES | Correctness, security, performance, readability |
-| `/gaia-qa-tests` | QA Tests | PASSED / FAILED | E2E and API test generation + execution |
-| `/gaia-security-review` | Security Review | PASSED / FAILED | OWASP Top 10, secrets, auth patterns |
-| `/gaia-test-automate` | Test Automation | PASSED / FAILED | Coverage gaps, uncovered code paths |
-| `/gaia-test-review` | Test Review | PASSED / FAILED | Test quality, flakiness, isolation, determinism |
-| `/gaia-review-perf` | Performance Review | PASSED / FAILED | N+1 queries, memory, bundle size, caching, complexity. Auto-passes if no performance-relevant code changes |
-
-**Optional prompts** (offered at natural lifecycle points — user can accept or skip):
-
-| Review Command | Trigger Point | When Prompted | Recommended For |
-|---|---|---|---|
-| `/gaia-review-api` | After `/gaia-create-arch` | End of architecture design (step 9) | Projects with REST APIs |
-| `/gaia-review-a11y` | After `/gaia-create-ux` | End of UX design (step 8) | User-facing applications |
-| `/gaia-edge-cases` | After `/gaia-create-epics` | End of epic/story creation (step 8) | Before sprint planning |
-| `/gaia-review-deps` | During `/gaia-brownfield` | After dependency map (step 5) | Brownfield projects |
-| `/gaia-review-perf` | Review Gate member | Required (auto-passes if no perf-relevant changes) | See Review Gate members table above |
-| `/gaia-a11y-testing` | During `/gaia-deploy-checklist` | After loading context (step 2) | Frontend/user-facing applications |
-| `/gaia-mobile-testing` | During `/gaia-sprint-plan` | After story selection (step 4) | Mobile/responsive applications |
-
-All reviews can also be run independently anytime on any artifact or codebase.
-
-### Editorial & Documentation
-
-| Command | Task | Description |
-|---------|------|-------------|
-| `/gaia-editorial-prose` | Editorial Prose | Clinical copy-editing review |
-| `/gaia-editorial-structure` | Editorial Structure | Structural editing review |
-| `/gaia-summarize` | Summarize Document | Generate executive summary |
-| `/gaia-index-docs` | Index Docs | Generate document index for a folder |
-| `/gaia-shard-doc` | Shard Document | Split large docs into sections |
-| `/gaia-merge-docs` | Merge Documents | Merge multiple markdown files |
-| `/gaia-changelog` | Generate Changelog | Changelog from git history |
-
-### Framework
-
-| Command | Task | Description |
-|---------|------|-------------|
-| `/gaia-build-configs` | Build Configs | Regenerate pre-resolved config files |
-| `/gaia-validate-framework` | Validate Framework | Self-validation and consistency check |
-| `/gaia-resume` | Resume | Resume from last checkpoint after context loss |
+| Command | Task | Model | Description |
+|---------|------|-------|-------------|
+| `/gaia-build-configs` | Build Configs | Sonnet | Regenerate pre-resolved config files |
+| `/gaia-validate-framework` | Validate Framework | Sonnet | Self-validation and consistency check |
+| `/gaia-resume` | Resume | Sonnet | Resume from last checkpoint after context loss |
+| `/gaia-run-all-reviews` | Run All Reviews | Sonnet | Execute all 6 review gate checks sequentially |
 
 ---
 
-## Shared Skills
+## Typical Workflow
 
-Skills are loaded just-in-time by developer agents. Each skill is divided into sections so only the relevant portion is loaded (keeping context usage low).
-
-| Skill | Sections | Used by |
-|-------|----------|---------|
-| **Git Workflow** | branching, commits, pull-requests, conflict-resolution | All devs, Scrum Master, DevOps |
-| **API Design** | rest-conventions, graphql, openapi, versioning, error-standards | All devs, Architect, Data Engineer |
-| **Database Design** | schema-design, migrations, indexing, orm-patterns | Java, Python, Architect, Data Engineer |
-| **Docker Workflow** | multi-stage-builds, compose, security-scanning | TS, Angular, Java, Python, Mobile, DevOps |
-| **Testing Patterns** | tdd-cycle, unit-testing, integration-testing, test-doubles | All devs, QA, Test Architect |
-| **Code Review Standards** | review-checklist, solid-principles, complexity-metrics | All devs |
-| **Documentation Standards** | readme-template, adr-format, inline-comments, api-docs | All devs, Tech Writer, Analyst, PM |
-| **Security Basics** | owasp-top-10, input-validation, secrets-management, cors-csrf | All devs, Architect, Security, DevOps |
-
----
-
-## Knowledge Fragments
-
-Stack-specific and domain-specific knowledge loaded on demand.
-
-### Developer Knowledge (by stack)
-
-| Stack | Fragments |
-|-------|-----------|
-| TypeScript | React patterns, Next.js patterns, Express patterns, TS conventions |
-| Angular | Angular conventions, Angular patterns, NgRx state, RxJS patterns |
-| Flutter | Dart conventions, Widget patterns, State management, Platform channels |
-| Java | Spring Boot patterns, JPA patterns, Microservices, Maven/Gradle |
-| Python | Python conventions, Django patterns, FastAPI patterns, Data pipelines |
-| Mobile | React Native patterns, Swift patterns, Kotlin patterns, Mobile testing |
-
-### Testing Knowledge (by tier)
-
-| Tier | Fragments |
-|------|-----------|
-| **Core** | Test pyramid, Test isolation, Fixture architecture, Deterministic testing |
-| **Extended** | API testing patterns, Data factories, Risk governance, Selector resilience |
-| **Specialized** | Contract testing, Visual testing, Test healing |
-| **Performance** | k6 patterns, Lighthouse CI |
-| **Accessibility** | WCAG checks, Axe-core patterns |
-| **Mobile** | Appium patterns, React Native testing, Responsive testing |
-| **Unit Testing** | Jest/Vitest patterns, JUnit5 patterns, Pytest patterns |
-
----
-
-## Output Artifacts
-
-Every workflow writes its output to a specific artifact directory:
+### Greenfield — new project from idea to deployment
 
 ```
-docs/
-├── planning-artifacts/         # PRDs, research, architecture, epics
-├── implementation-artifacts/   # Sprint plans, stories, reviews, changelogs
-├── test-artifacts/             # Test plans, traceability, accessibility
-└── creative-artifacts/         # Design thinking, innovation, pitch decks
+# Phase 1: Analysis
+/gaia-brainstorm             → brainstorm the idea
+/gaia-product-brief          → create a product brief
+
+# Phase 2: Planning
+/gaia-create-prd             → write the PRD
+/gaia-create-ux              → design the UX
+
+# Phase 3: Solutioning
+/gaia-create-arch            → design the architecture
+/gaia-test-design            → create test plan
+/gaia-create-epics           → break into epics and stories
+/gaia-trace                  → generate traceability matrix
+/gaia-ci-setup               → scaffold CI pipeline
+/gaia-readiness-check        → verify everything is ready
+
+# Phase 4: Implementation (repeat per sprint)
+/gaia-sprint-plan            → plan the sprint
+/gaia-dev-story              → implement stories
+/gaia-run-all-reviews        → run all 6 review gates
+/gaia-retro                  → sprint retrospective
+
+# Phase 5: Deployment
+/gaia-deploy-checklist       → pre-deploy verification
+/gaia-post-deploy            → post-deploy health check
 ```
+
+For **brownfield projects** (existing codebases), start with `/gaia-brownfield` — a 6-step orchestration that scans your codebase, generates documentation (APIs, UX, events, dependencies, NFR baselines), creates a gap-focused PRD, and maps the architecture. Then continue from Phase 3 above.
 
 ---
 
-## Templates
-
-Document templates in `_gaia/lifecycle/templates/` provide standardized structures for workflow outputs. Each template has YAML frontmatter (`template`, `version`, `used_by`) and placeholder sections that agents fill during execution.
-
-| Template | Used By | Description |
-|----------|---------|-------------|
-| `prd-template.md` | create-prd | Product requirements document |
-| `architecture-template.md` | create-architecture | Greenfield architecture document |
-| `brownfield-architecture-template.md` | brownfield-onboarding | As-is/target architecture with Mermaid C4 diagrams |
-| `story-template.md` | create-epics-stories | User story with acceptance criteria |
-| `sprint-plan-template.md` | sprint-planning | Sprint plan with capacity and goals |
-| `product-brief-template.md` | create-product-brief | Product brief for stakeholder alignment |
-| `review-template.md` | code-review | Code review report |
-| `test-plan-template.md` | test-design | Test plan with strategy and coverage |
-| `deployment-template.md` | release-plan | Deployment plan and checklist |
-| `api-documentation-template.md` | brownfield-onboarding | OpenAPI/Swagger API documentation |
-| `event-catalog-template.md` | brownfield-onboarding | Event producer/consumer catalog |
-| `dependency-map-template.md` | brownfield-onboarding | Service, infrastructure, and library dependencies |
-| `nfr-assessment-template.md` | brownfield-onboarding | Non-functional requirements baselines |
-| `ux-design-assessment-template.md` | brownfield-onboarding | UI patterns and accessibility assessment |
-| `epic-status-template.md` | epic-status | Epic completion dashboard with progress bars |
-| `brownfield-onboarding-template.md` | brownfield-onboarding | Developer knowledge base index |
-
----
-
-## Checkpoint & Resume
-
-Long-running workflows save checkpoints to `_gaia/_memory/checkpoints/`. If your session is interrupted or context is lost, run `/gaia-resume` to pick up from the last completed step.
-
-Completed workflow checkpoints move to `_gaia/_memory/checkpoints/completed/`.
-
----
-
-## Agent Memory
-
-Each agent has a persistent memory sidecar that survives across sessions:
+## Architecture
 
 ```
-_gaia/_memory/
-├── architect-sidecar/
-├── devops-sidecar/
-├── orchestrator-sidecar/
-├── pm-sidecar/
-├── security-sidecar/
-├── sm-sidecar/
-├── storyteller-sidecar/
-├── tech-writer-sidecar/
-└── test-architect-sidecar/
+_gaia/
+├── _config/              # Global config, manifests
+│   ├── global.yaml       # Project settings — single source of truth
+│   └── manifest.yaml     # Module versions
+├── _memory/              # Persistent agent memory + checkpoints
+│   ├── checkpoints/      # Workflow progress snapshots (sha256-verified)
+│   └── *-sidecar/        # Per-agent persistent memory (9 sidecars)
+├── core/                 # Execution engine, protocols, shared tasks
+│   └── engine/           # workflow.xml (7-step flow), task-runner.xml
+├── lifecycle/            # 5 phases: analysis → deployment
+│   ├── agents/           # 11 lifecycle agents
+│   ├── workflows/        # 36 workflows across 5 phases
+│   └── templates/        # 18 document templates
+├── dev/                  # Developer tooling
+│   ├── agents/           # 6 stack-specific developers
+│   ├── skills/           # 8 shared skills (sectioned loading)
+│   └── knowledge/        # Stack-specific patterns
+├── creative/             # 6 creative agents + 7 workflows
+└── testing/              # Test Architect + 12 testing workflows
 ```
 
-Agents store decisions, patterns, and context they learn about your project. This memory accumulates over time, making agents more effective the more you use them.
+### At a glance
+
+| Component | Count |
+|-----------|-------|
+| Agents | 25 with distinct personas |
+| Workflows | 64 across 5 lifecycle phases |
+| Standalone tasks | 15 (reviews, audits, utilities) |
+| Slash commands | 104 |
+| Shared skills | 8 with 47 loadable sections |
+| Knowledge fragments | 45 |
+| Document templates | 18 |
+| Quality gates | 17 (enforced, not advisory) |
 
 ---
 
 ## Configuration
 
-### global.yaml
-
-The single source of truth for project settings at `_gaia/_config/global.yaml`:
+The single source of truth is `_gaia/_config/global.yaml`:
 
 ```yaml
 framework_name: "GAIA"
-framework_version: "1.27.0"
-
+framework_version: "1.27.1"
 user_name: "your-name"
 project_name: "your-project"
-project_root: "{project-root}"
-
-output_folder: "{project-root}/docs"
-planning_artifacts: "{project-root}/docs/planning-artifacts"
-implementation_artifacts: "{project-root}/docs/implementation-artifacts"
-test_artifacts: "{project-root}/docs/test-artifacts"
-creative_artifacts: "{project-root}/docs/creative-artifacts"
 ```
 
-The `{project-root}` placeholder is resolved at runtime. After changing `global.yaml`, run `/gaia-build-configs` to regenerate resolved configs.
-
-### Pre-resolved configs
-
-Each module (core, lifecycle, creative, testing) has a `.resolved/` directory for pre-built config files. These eliminate runtime config resolution overhead. Generate them with `/gaia-build-configs`.
+After changing `global.yaml`, run `/gaia-build-configs` to regenerate pre-resolved configs. Each module has a `.resolved/` directory that eliminates runtime config resolution overhead.
 
 ---
 
-## Teams
+## Checkpoint & Resume
 
-Pre-built team compositions for different project types:
-
-| Team | Focus | Agents |
-|------|-------|--------|
-| Full | Complete coverage | All lifecycle + dev agents |
-| Planning | Requirements & design | Analyst, PM, UX Designer, Architect |
-| Implementation | Build & ship | SM, dev agents, QA, DevOps |
-| Quick Ship | Minimal ceremony | PM, dev agent, QA |
-| Enterprise | Governance-heavy | Full team + Security, Performance |
-| Security-Focused | Security-first | Architect, Security, DevOps, QA |
-| Data-Intensive | Data pipelines | Architect, Data Engineer, Python Dev |
+Long-running workflows save checkpoints to `_gaia/_memory/checkpoints/` with sha256 checksums of all files touched. If your session is interrupted, run `/gaia-resume` — it validates file integrity before resuming from the last completed step.
 
 ---
 
-## Typical Workflows
+## Agent Memory
 
-### Greenfield — New project from idea to deployment
+Each agent has a persistent memory sidecar (`_gaia/_memory/*-sidecar/`) that stores decisions, patterns, and context across sessions. Agents become more effective the more you use them. Run `/gaia-memory-hygiene` periodically to detect stale or contradicted decisions.
 
-```
-# Phase 1: Analysis
-/gaia-brainstorm           → brainstorm the idea
-/gaia-product-brief        → create a product brief
-/gaia-market-research      → validate market fit
+---
 
-# Phase 2: Planning
-/gaia-create-prd           → write the PRD (optional: adversarial review)
-/gaia-create-ux            → design the UX (optional: accessibility review)
+## Limitations
 
-# Phase 3: Solutioning
-/gaia-create-arch          → design the architecture (optional: API review, adversarial review)
-/gaia-test-design          → create test plan (optional: scaffold test framework)
-/gaia-create-epics         → break into epics and stories (optional: edge cases, adversarial review)
-/gaia-trace                → generate traceability matrix
-/gaia-ci-setup             → scaffold CI pipeline
-/gaia-readiness-check      → verify everything is ready (optional: adversarial review)
+- **Single-user only** — GAIA uses markdown files for state management (stories, sprint status, architecture docs). Multiple team members editing the same project will run into file conflicts.
+- **Claude Code required** — GAIA is built specifically for Claude Code and cannot run on other AI coding assistants.
+- **Context budget** — Complex workflows can consume significant context. The framework enforces a 40K token budget per activation with just-in-time loading to manage this, but very large projects may hit limits.
 
-# Phase 4: Implementation (repeat per sprint)
-/gaia-sprint-plan          → plan the sprint (optional: mobile testing)
-/gaia-create-story         → create detailed stories
-/gaia-validate-story       → validate story completeness
-/gaia-fix-story            → fix issues from validation
-/gaia-atdd                 → write acceptance tests (REQUIRED for high-risk stories)
-/gaia-dev-story            → implement stories
-/gaia-code-review          → review the code          ─┐
-/gaia-qa-tests             → generate tests             │
-/gaia-security-review      → security audit              │ Review Gate
-/gaia-test-automate        → expand test coverage        │ (all 6 must
-/gaia-test-review          → review test quality         │  PASS before
-/gaia-review-perf          → performance review         ─┘  story → done)
-/gaia-triage-findings      → triage dev findings into backlog
-/gaia-retro                → sprint retrospective
+---
 
-# Phase 5: Deployment
-/gaia-release-plan         → plan the release
-/gaia-deploy-checklist     → pre-deploy verification (optional: a11y testing)
-/gaia-post-deploy          → post-deploy health check
-```
+## Contributing
 
-### Brownfield — Onboard an existing project
+Contributions are welcome. Please open an issue to discuss your idea before submitting a PR.
 
-```
-# Onboarding (scans codebase, generates knowledge base)
-/gaia-brownfield           → deep project discovery (10 steps)
-                              1. Scan codebase → project-documentation.md
-                              2. API documentation (if APIs detected)
-                              3. UX assessment (if frontend detected)
-                              4. Event catalog (if messaging detected)
-                              5. Dependency map
-                              6. NFR assessment & baselines
-                              7. Performance test plan
-                              8. Gap-focused PRD (gaps only, not existing features)
-                              9. Architecture with as-is/target diagrams
-                             10. Epics/stories for gaps + developer knowledge base
-
-# Phase 3: Readiness
-/gaia-test-design          → create test plan (optional: scaffold test framework)
-/gaia-trace                → generate traceability matrix
-/gaia-ci-setup             → scaffold CI pipeline
-/gaia-readiness-check      → verify everything is ready (optional: adversarial review)
-
-# Phase 4: Implementation (repeat per sprint)
-/gaia-sprint-plan          → plan the sprint (optional: mobile testing)
-/gaia-create-story         → create detailed stories
-/gaia-validate-story       → validate story completeness
-/gaia-fix-story            → fix issues from validation
-/gaia-atdd                 → write acceptance tests (REQUIRED for high-risk stories)
-/gaia-dev-story            → implement gap stories
-/gaia-code-review          → review the code          ─┐
-/gaia-qa-tests             → generate tests             │
-/gaia-security-review      → security audit              │ Review Gate
-/gaia-test-automate        → expand test coverage        │ (all 6 must
-/gaia-test-review          → review test quality         │  PASS before
-/gaia-review-perf          → performance review         ─┘  story → done)
-/gaia-triage-findings      → triage dev findings into backlog
-/gaia-retro                → sprint retrospective
-
-# Phase 5: Deployment
-/gaia-release-plan         → plan the release
-/gaia-deploy-checklist     → pre-deploy verification (optional: a11y testing)
-/gaia-post-deploy          → post-deploy health check
-```
-
-### Quick Flow — Small changes, minimal ceremony
-
-```
-/gaia-quick-spec           → rapid tech spec
-/gaia-quick-dev            → implement it
-```
+By contributing, you agree that your contributions will be licensed under the same AGPL-3.0 license and that you grant the project maintainers the right to relicense your contributions under a commercial license (CLA).
 
 ---
 
 ## License
 
-MIT
+[AGPL-3.0](LICENSE)
+
+The open-source framework is licensed under the GNU Affero General Public License v3.0. A commercial license is available for teams and enterprises that want to use GAIA without AGPL obligations or connect to the GAIA SaaS platform.
