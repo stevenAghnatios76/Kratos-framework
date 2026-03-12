@@ -23,20 +23,20 @@
   <action>When subagent returns: read story file, check Code Review row status. Log result.</action>
 </step>
 
-<step n="3" title="Run QA Tests">
-  <action>Skip if QA Tests row already shows PASSED</action>
-  <action>Spawn a subagent using the Agent tool with this prompt:
-    "Load {project-root}/_gaia/core/engine/workflow.xml, then process {project-root}/_gaia/lifecycle/workflows/4-implementation/qa-generate-tests/workflow.yaml as workflow-config. The story key is {story_key}. Run in YOLO mode — auto-proceed past all template-outputs. Follow the workflow engine instructions EXACTLY."
-  </action>
-  <action>When subagent returns: read story file, check QA Tests row status. Log result.</action>
-</step>
-
-<step n="4" title="Run Security Review">
+<step n="3" title="Run Security Review">
   <action>Skip if Security Review row already shows PASSED</action>
   <action>Spawn a subagent using the Agent tool with this prompt:
     "Load {project-root}/_gaia/core/engine/workflow.xml, then process {project-root}/_gaia/lifecycle/workflows/4-implementation/security-review/workflow.yaml as workflow-config. The story key is {story_key}. Run in YOLO mode — auto-proceed past all template-outputs. Follow the workflow engine instructions EXACTLY."
   </action>
   <action>When subagent returns: read story file, check Security Review row status. Log result.</action>
+</step>
+
+<step n="4" title="Run QA Tests">
+  <action>Skip if QA Tests row already shows PASSED</action>
+  <action>Spawn a subagent using the Agent tool with this prompt:
+    "Load {project-root}/_gaia/core/engine/workflow.xml, then process {project-root}/_gaia/lifecycle/workflows/4-implementation/qa-generate-tests/workflow.yaml as workflow-config. The story key is {story_key}. Run in YOLO mode — auto-proceed past all template-outputs. Follow the workflow engine instructions EXACTLY."
+  </action>
+  <action>When subagent returns: read story file, check QA Tests row status. Log result.</action>
 </step>
 
 <step n="5" title="Run Test Automation">

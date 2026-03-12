@@ -2,7 +2,7 @@
 inherits: "{project-root}/_gaia/_config/global.yaml"
 
 module_name: "lifecycle"
-module_version: "1.21.16"
+module_version: "1.21.17"
 
 planning_artifacts: "{project-root}/docs/planning-artifacts"
 implementation_artifacts: "{project-root}/docs/implementation-artifacts"
