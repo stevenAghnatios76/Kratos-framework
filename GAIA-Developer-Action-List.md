@@ -29,10 +29,10 @@
 | G. Brownfield Cluster | 8 | 0 | 8 |
 | H. Run-All-Reviews Cluster | 5 | 0 | 5 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 0 | 18 |
-| J. Individual High-Severity Bugs | 8 | 2 | 6 |
+| J. Individual High-Severity Bugs | 8 | 3 | 5 |
 | K. Individual Medium-Severity Bugs | 28 | 0 | 28 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **37** | **85** |
+| **TOTAL** | **122** | **38** | **84** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -340,10 +340,8 @@ These are not part of a systemic cluster but are individually high-impact.
 - [x] **BUG-007** (High) — `/gaia-product-brief` missing quality gate for brainstorm existence
   - Fix: Added pre_start quality gate to workflow.yaml checking project-brainstorm.md exists. HALTs with directive to run /gaia-brainstorm first.
 
-- [ ] **BUG-014** (High) — `/gaia-validate-prd` validation too superficial — misses structural issues
-  - File: `validate-prd/instructions.xml`
-  - Fix: Add structural validation: check all FR/NFR are numbered, acceptance criteria exist for each, priority is assigned
-  - **Comment:** The validator should catch what the adversarial review catches — it currently just checks for section existence, not content quality.
+- [x] **BUG-014** (High) — `/gaia-validate-prd` validation too superficial — misses structural issues
+  - Fix: Added Step 3 "Structural Validation" with 7 checks: FR/NFR numbering, AC existence, measurable NFR targets, priority assignment, persona cross-reference.
 
 - [ ] **BUG-024** (High) — `/gaia-create-arch` architecture decisions not traceable to requirements
   - File: `create-architecture/instructions.xml`
