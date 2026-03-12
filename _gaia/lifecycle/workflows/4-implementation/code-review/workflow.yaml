@@ -7,6 +7,10 @@ config_source: "{project-root}/_gaia/lifecycle/config.yaml"
 installed_path: "{project-root}/_gaia/lifecycle/workflows/4-implementation/code-review"
 instructions: "{installed_path}/instructions.xml"
 validation: "{installed_path}/checklist.md"
+input_file_patterns:
+  architecture:
+    whole: "{planning_artifacts}/architecture.md"
+    load_strategy: "INDEX_GUIDED"
 quality_gates:
   pre_start:
     - check: "story_status == 'review'"

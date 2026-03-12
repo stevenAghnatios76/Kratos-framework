@@ -34,14 +34,20 @@
   <action>Verify DB migration rollback scripts work</action>
   <action>Define rollback trigger criteria</action>
 </step>
-<step n="6" title="Approval Gates">
+<step n="6a" title="Automated Verification Gates">
   <action>Verify readiness-report.md status is PASS — if not PASS, HALT deployment</action>
   <action>Verify traceability-matrix.md coverage is complete — flag gaps as blocking</action>
   <action>Verify ci-setup.md quality gates are enforced (not advisory-only)</action>
+</step>
+<step n="6b" title="QA Sign-Off">
   <ask>QA sign-off: confirm all acceptance tests pass and no critical bugs are open. Enter CONFIRMED or provide blocking issue.</ask>
-  <check if="qa_signoff != CONFIRMED">HALT: QA sign-off is required before deployment.</check>
+  <check if="qa_signoff != CONFIRMED">HALT: QA sign-off is required before deployment. Resolve the blocking issue and re-run.</check>
+</step>
+<step n="6c" title="Security Sign-Off">
   <ask>Security sign-off: confirm security review is complete with no critical findings. Enter CONFIRMED or provide blocking findings.</ask>
-  <check if="security_signoff != CONFIRMED">HALT: Security sign-off is required before deployment.</check>
+  <check if="security_signoff != CONFIRMED">HALT: Security sign-off is required before deployment. Resolve blocking findings and re-run.</check>
+</step>
+<step n="6d" title="Stakeholder Approval">
   <ask>Stakeholder approval: confirm release scope is approved. Enter CONFIRMED.</ask>
   <check if="stakeholder_approval != CONFIRMED">HALT: Stakeholder approval required before deployment.</check>
 </step>

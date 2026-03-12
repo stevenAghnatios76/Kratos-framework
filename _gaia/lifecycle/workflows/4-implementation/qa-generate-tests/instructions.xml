@@ -1,7 +1,7 @@
 <workflow name="qa-generate-tests">
 <critical>
   <mandate>Story must be in review status before QA testing</mandate>
-  <mandate>Generated tests should pass on first run against implemented code</mandate>
+  <mandate>Do NOT write executable test files to the source tree (tests/, spec/, __tests__/, e2e/). Document test cases in the QA report only, written to {test_artifacts}/.</mandate>
   <mandate>Output must include machine-readable PASSED or FAILED verdict</mandate>
 </critical>
 <step n="1" title="Load Story and Code">
@@ -12,16 +12,19 @@
   <action>Verify story is in 'review' status</action>
   <check if="status != review">HALT: Story must be in review status before QA testing</check>
 </step>
-<step n="3" title="API Test Generation">
-  <action>Generate API/integration tests for endpoints</action>
-  <action>Cover happy path and error cases</action>
+<step n="3" title="API Test Case Documentation">
+  <action>Document API/integration test cases for endpoints — do NOT write executable test files</action>
+  <action>For each test case: describe endpoint, method, input, expected response, and edge cases</action>
+  <action>Cover happy path, error cases, boundary conditions, and authorization scenarios</action>
 </step>
-<step n="4" title="E2E Test Generation">
-  <action>Generate end-to-end test scenarios from user journeys</action>
+<step n="4" title="E2E Test Case Documentation">
+  <action>Document end-to-end test scenarios from user journeys — do NOT write executable test files</action>
+  <action>For each scenario: describe preconditions, user actions, assertions, and cleanup</action>
 </step>
 <step n="5" title="Test Execution">
-  <action>Run generated tests</action>
-  <action>Verify they pass against current implementation</action>
+  <action>If executable tests already exist in the source tree for this story: run them and report results</action>
+  <action>If no existing tests: run the application and manually verify key acceptance criteria through API calls or UI inspection</action>
+  <action>Do NOT create new test files in the source tree — test file creation is the responsibility of /gaia-test-automate</action>
 </step>
 <step n="6" title="Verdict">
   <action>If ALL tests pass: verdict is PASSED</action>

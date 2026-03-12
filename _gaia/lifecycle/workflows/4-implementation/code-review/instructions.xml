@@ -13,6 +13,16 @@
 <step n="3" title="Code Review">
   <action>Review each changed file for: correctness, security, performance, readability, test coverage</action>
 </step>
+<step n="3b" title="Architecture Conformance">
+  <action>Load {planning_artifacts}/architecture.md — extract ADRs, component hierarchy, layer boundaries, and API patterns</action>
+  <action>For each changed file, verify:
+    - Component placement follows the documented hierarchy (e.g., controllers in controller layer, services in service layer)
+    - Dependencies flow in the correct direction per architecture (no upward dependencies across layers)
+    - API patterns match the architecture specification (naming, versioning, error format)
+    - Referenced ADRs exist and have status Accepted — flag if implementation contradicts an ADR decision
+  </action>
+  <action>Include an "Architecture Conformance" section in findings with PASS/FAIL per check</action>
+</step>
 <step n="4" title="Generate Findings">
   <action>List issues by severity: critical, warning, suggestion</action>
 </step>

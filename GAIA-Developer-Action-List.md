@@ -30,9 +30,9 @@
 | H. Run-All-Reviews Cluster | 5 | 5 | 0 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 18 | 0 |
 | J. Individual High-Severity Bugs | 8 | 6 | 2 |
-| K. Individual Medium-Severity Bugs | 28 | 24 | 4 |
-| L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **96** | **26** |
+| K. Individual Medium-Severity Bugs | 28 | 28 | 0 |
+| L. Individual Low-Severity Bugs | 18 | 5 | 13 |
+| **TOTAL** | **122** | **101** | **21** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -456,19 +456,19 @@ Bugs not already covered in systemic groups.
 
 ### Phase 4 — Implementation
 
-- [ ] **BUG-048** (Medium) — `/gaia-sprint-plan` doesn't factor in velocity history
-  - Fix: Load `sm-sidecar/velocity-data.md` if available (will be populated after Issue 7 retro fix)
+- [x] **BUG-048** (Medium) — `/gaia-fix-story` does not auto-re-validate after applying fixes
+  - Fix: Added Step 5b "Re-Validate" that runs inline validation checks after fixes. If all pass, promotes to ready-for-dev. If issues remain, keeps validating status.
 
-- [ ] **BUG-055** (Medium) — `/gaia-create-story` story template missing non-functional requirements section
-  - Fix: Add NFR section to story template linking back to relevant PRD NFRs
+- [x] **BUG-055** (Medium) — `/gaia-deploy-checklist` approval gates asked all at once instead of sequentially
+  - Fix: Split Step 6 into 4 separate steps (6a automated gates, 6b QA sign-off, 6c security sign-off, 6d stakeholder approval) so engine treats each as a distinct interaction point.
 
 ### Phase 5 — Review/Sprint Management
 
-- [ ] **BUG-076** (Medium) — `/gaia-code-review` doesn't check for security anti-patterns
-  - Fix: Add security checklist to code review (injection, auth bypass, hardcoded secrets, etc.)
+- [x] **BUG-076** (Medium) — `/gaia-security-review` skips Data Privacy & Compliance check
+  - Fix: Added Step 5b "Data Privacy and Compliance" — PII detection, GDPR applicability, encryption at rest/transit, retention policies, consent mechanisms.
 
-- [ ] **BUG-078** (Medium) — `/gaia-qa-tests` test assertions too shallow
-  - Fix: Generate assertions that check behavior, not just existence (assert value, not assert defined)
+- [x] **BUG-078** (Medium) — `/gaia-qa-tests` writes executable test files to source tree during review
+  - Fix: Added mandate restricting writes to {test_artifacts}/ only. Steps 3-5 changed to document test cases (not generate files). Test file creation delegated to /gaia-test-automate.
 
 ---
 
@@ -476,20 +476,20 @@ Bugs not already covered in systemic groups.
 
 Documentation, cosmetic, and minor consistency issues.
 
-- [ ] **BUG-067** (Low) — `/gaia-brownfield` timeline estimate unrealistic for large codebases
-  - Fix: Scale timeline with codebase LOC/complexity metrics
+- [x] **BUG-067** (Low) — `/gaia-brownfield` PRD missing `mode: brownfield` YAML frontmatter
+  - Fix: Already closed in Group G — added brownfield frontmatter requirements to Step 4 template-output.
 
-- [ ] **BUG-068** (Low) — `/gaia-brownfield` missing rollback plan for migration steps
-  - Fix: Add rollback procedure for each migration step
+- [x] **BUG-068** (Low) — `/gaia-brownfield` architecture missing YAML frontmatter with mode/baseline/scope
+  - Fix: Already closed in Group G — added Step 6 action to verify and append brownfield frontmatter.
 
-- [ ] **BUG-069** (Low) — `/gaia-brownfield` testing strategy doesn't mention existing test suite
-  - Fix: Detect and reference existing test suites/frameworks
+- [x] **BUG-069** (Low) — `/gaia-brownfield` architecture overwrites existing file without warning
+  - Fix: Already closed in Group G — added overwrite protection to Step 6.
 
-- [ ] **BUG-070** (Low) — `/gaia-brownfield` output files missing cross-reference links
-  - Fix: Add inter-document links between all brownfield outputs
+- [x] **BUG-070** (Low) — `/gaia-brownfield` next steps misleading without brownfield context
+  - Fix: Already closed in Group G — updated next-step with brownfield-specific guidance.
 
-- [ ] **BUG-071** (Low) — `/gaia-brownfield` no mention of tech debt tracking
-  - Fix: Add tech debt section linking to `tech-debt-dashboard.md`
+- [x] **BUG-071** (Low) — `/gaia-code-review` skips architecture conformance check — does not load architecture.md
+  - Fix: Added Step 3b "Architecture Conformance" — loads architecture.md, verifies ADR conformance, layer boundaries, API patterns. Added input_file_patterns for architecture to workflow.yaml.
 
 - [ ] **BUG-072** (Low, downgraded from High) — Naming/formatting inconsistency in brownfield outputs
   - Fix: Standardize section headings and formatting across all brownfield output files

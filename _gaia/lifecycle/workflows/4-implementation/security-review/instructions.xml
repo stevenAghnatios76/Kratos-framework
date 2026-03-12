@@ -40,6 +40,17 @@
   <action>Validate session management and token handling</action>
   <action>Check for privilege escalation paths</action>
 </step>
+<step n="5b" title="Data Privacy and Compliance">
+  <action>Identify if the story handles PII (names, emails, addresses, phone numbers, payment data, health data, authentication tokens, user-generated content with metadata)</action>
+  <action>If PII is handled:
+    - GDPR applicability: check for consent mechanisms, right-to-delete support, data portability, lawful basis for processing
+    - Data encryption: verify PII is encrypted at rest (database-level or field-level) and in transit (TLS)
+    - Data retention: check if retention policies are defined — flag if no retention period or deletion mechanism exists
+    - Data minimization: flag collection of PII fields not required for the feature's purpose
+    - Cross-border transfer: flag if PII may be stored or processed in different jurisdictions without safeguards
+  </action>
+  <action>If no PII detected: record "No PII handling identified in this story" for auditability</action>
+</step>
 <step n="6" title="Generate Findings">
   <action>Classify each finding by severity: critical, high, medium, low, info</action>
   <action>Include: finding description, location, OWASP category, remediation suggestion</action>
@@ -51,7 +62,7 @@
 </step>
 <step n="8" title="Generate Output">
   <template-output file="{implementation_artifacts}/{story_key}-security-review.md">
-    Generate security review report with: summary, OWASP findings table, secrets scan results, auth review results, overall risk assessment, and machine-readable verdict (PASSED/FAILED).
+    Generate security review report with: summary, OWASP findings table, secrets scan results, auth review results, data privacy and compliance assessment, overall risk assessment, and machine-readable verdict (PASSED/FAILED).
   </template-output>
 </step>
 <step n="9" title="Update Review Gate and Transition">
