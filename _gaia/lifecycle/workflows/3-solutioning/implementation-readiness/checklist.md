@@ -35,6 +35,8 @@ validation-target: 'Readiness gate report'
 ## Security
 - [ ] Security requirements documented
 - [ ] Auth strategy defined
+- [ ] Compliance timeline estimated (GDPR, PCI-DSS if applicable)
+- [ ] No P0 compliance stories in Post-MVP epics (or flagged as WARNING)
 ## Operational Readiness
 - [ ] Rollback procedure documented and feasible
 - [ ] Observability stack defined (logging, metrics, alerting)

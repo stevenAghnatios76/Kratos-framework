@@ -73,6 +73,8 @@
   <action>Are security requirements documented in PRD?</action>
   <action>Is authentication/authorization defined in architecture?</action>
   <action>Are data privacy requirements addressed?</action>
+  <action>Compliance timeline: If PRD or threat-model.md references GDPR, PCI-DSS, HIPAA, or other compliance frameworks, estimate implementation weeks based on related story count and complexity. List each framework with its estimated timeline and the stories that implement it.</action>
+  <action>Priority/schedule conflict: Scan epics-and-stories.md for P0 or P1 compliance-related stories placed in Post-MVP or late-phase epics. Flag each as a WARNING — high-priority compliance work scheduled after MVP creates regulatory risk.</action>
 </step>
 <step n="8" title="Operational Readiness">
   <action>Rollback: Is a rollback procedure documented in architecture or release plan? Can the deployment be reversed without data loss?</action>

@@ -30,9 +30,9 @@
 | H. Run-All-Reviews Cluster | 5 | 5 | 0 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 18 | 0 |
 | J. Individual High-Severity Bugs | 8 | 6 | 2 |
-| K. Individual Medium-Severity Bugs | 28 | 12 | 16 |
+| K. Individual Medium-Severity Bugs | 28 | 13 | 15 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **84** | **38** |
+| **TOTAL** | **122** | **85** | **37** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -418,8 +418,8 @@ Bugs not already covered in systemic groups.
 - [x] **BUG-027** (Medium) — `/gaia-readiness-check` TEA assessment missing Technical and Estimation evaluations
   - Fix: Expanded Step 5 to cover all TEA dimensions: Technical (team expertise, learning curve), Estimation (numeric points, oversized story detection), Architecture (ADR resolution, adversarial findings), Testing (existing items). Added sub-fields to gate report YAML.
 
-- [ ] **BUG-028** (Medium) — `/gaia-test-design` no risk-based test prioritization
-  - Fix: Map tests to story risk levels (High/Medium/Low) and prioritize accordingly
+- [x] **BUG-028** (Medium) — `/gaia-readiness-check` security assessment missing compliance timeline
+  - Fix: Added compliance timeline estimation (GDPR, PCI-DSS weeks based on story count) and P0/Post-MVP conflict detection to Step 7. Updated checklist.
 
 - [ ] **BUG-029** (Medium) — `/gaia-test-design` acceptance criteria not extracted from stories
   - Fix: After Issue 5 is resolved (ATDD formalization), cross-reference with epics ACs

@@ -1,4 +1,4 @@
-# GAIA Framework v1.27.44
+# GAIA Framework v1.27.45
 
 This project uses the **GAIA** (Generative Agile Intelligence Architecture) framework — an AI agent framework for Claude Code that orchestrates software product development through 25 specialized agents, 62 workflows, and 8 shared skills.
 
