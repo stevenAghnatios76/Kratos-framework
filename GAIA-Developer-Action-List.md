@@ -30,9 +30,9 @@
 | H. Run-All-Reviews Cluster | 5 | 5 | 0 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 18 | 0 |
 | J. Individual High-Severity Bugs | 8 | 6 | 2 |
-| K. Individual Medium-Severity Bugs | 28 | 13 | 15 |
+| K. Individual Medium-Severity Bugs | 28 | 14 | 14 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **85** | **37** |
+| **TOTAL** | **122** | **86** | **36** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -421,8 +421,8 @@ Bugs not already covered in systemic groups.
 - [x] **BUG-028** (Medium) — `/gaia-readiness-check` security assessment missing compliance timeline
   - Fix: Added compliance timeline estimation (GDPR, PCI-DSS weeks based on story count) and P0/Post-MVP conflict detection to Step 7. Updated checklist.
 
-- [ ] **BUG-029** (Medium) — `/gaia-test-design` acceptance criteria not extracted from stories
-  - Fix: After Issue 5 is resolved (ATDD formalization), cross-reference with epics ACs
+- [x] **BUG-029** (Medium) — `/gaia-readiness-check` YAML frontmatter uses different schema than expected
+  - Fix: Standardized YAML to use date, checks_passed, critical_blockers fields. Renamed sections to standard names (completeness, consistency, contradictions, tea_readiness, test_infrastructure, security_readiness, operational_readiness, brownfield_completeness) with PASS/FAIL values instead of booleans.
 
 - [ ] **BUG-031** (Medium) — `/gaia-create-epics` story estimation inconsistent
   - Fix: Enforce consistent estimation scale (S/M/L/XL with point equivalents)

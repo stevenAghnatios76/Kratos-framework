@@ -54,7 +54,12 @@ validation-target: 'Readiness gate report'
 - [ ] dependency-audit-{date}.md exists in planning-artifacts
 ## Report
 - [ ] Machine-readable YAML frontmatter present
+- [ ] date field present in YAML
+- [ ] checks_passed aggregate (e.g., "7/8") in YAML
+- [ ] critical_blockers count in YAML
 - [ ] PASS/FAIL status clear
+- [ ] Section names use standard schema (completeness, consistency, contradictions, tea_readiness, test_infrastructure, security_readiness, operational_readiness, brownfield_completeness)
+- [ ] Values use PASS/FAIL (not boolean true/false), brownfield uses N/A when skipped
 - [ ] contradictions_found and contradictions_blocking counts in frontmatter
 - [ ] Blocking issues listed if FAIL
 ## Output Verification

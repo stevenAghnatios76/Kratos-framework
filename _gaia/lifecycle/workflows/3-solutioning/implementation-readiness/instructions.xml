@@ -98,32 +98,43 @@
     Generate readiness report with YAML frontmatter:
     ---
     status: PASS or FAIL or CONDITIONAL PASS
-    gate_results:
-      prd_complete: true/false
-      ux_complete: true/false
-      architecture_complete: true/false
-      stories_complete: true/false
-      contradiction_check: PASS/FAIL
-      tea_ready: true/false
-      tea_technical: PASS/FAIL (team expertise vs stack)
-      tea_estimation: PASS/FAIL (numeric points, no oversized stories)
-      tea_architecture: PASS/FAIL (ADRs resolved, findings incorporated)
-      test_plan_exists: true/false
-      traceability_complete: true/false
-      traceability_gate_decision: PASS/BLOCKED/FAIL/NOT_DECLARED
-      traceability_implementation_rate: "{N}%"
-      ci_gates_enforced: true/false
-      security_documented: true/false
-      rollback_feasible: true/false
-      observability_ready: true/false
-      release_strategy_defined: true/false
-      brownfield_complete: true/false/skipped
+    date: "{YYYY-MM-DD}"
+    checks_passed: "{N}/8"
+    critical_blockers: {count}
+    completeness: PASS/FAIL
+    completeness_detail:
+      prd_complete: PASS/FAIL
+      ux_complete: PASS/FAIL
+      architecture_complete: PASS/FAIL
+      stories_complete: PASS/FAIL
+    consistency: PASS/FAIL
+    contradictions: PASS/FAIL
     contradictions_found: {count}
     contradictions_blocking: {blocking_count}
+    tea_readiness: PASS/FAIL
+    tea_detail:
+      technical: PASS/FAIL
+      estimation: PASS/FAIL
+      architecture: PASS/FAIL
+      testing: PASS/FAIL
+    test_infrastructure: PASS/FAIL
+    test_infrastructure_detail:
+      test_plan_exists: PASS/FAIL
+      traceability_complete: PASS/FAIL
+      traceability_gate_decision: PASS/BLOCKED/FAIL/NOT_DECLARED
+      traceability_implementation_rate: "{N}%"
+      ci_gates_enforced: PASS/FAIL
+    security_readiness: PASS/FAIL
+    operational_readiness: PASS/FAIL
+    operational_detail:
+      rollback_feasible: PASS/FAIL
+      observability_ready: PASS/FAIL
+      release_strategy_defined: PASS/FAIL
+    brownfield_completeness: PASS/FAIL/N/A
     blocking_issues:
       - "issue description"
     ---
-    <check>Before finalizing the report: if traceability_gate_decision is BLOCKED or FAIL and traceability_complete is true, this is a self-contradiction. Fix traceability_complete to false and either set status to FAIL, or set status to CONDITIONAL PASS with an explicit justification note (e.g., "Planned test coverage is ~100% but test implementation is {N}% — tests will be implemented during sprint development").</check>
+    <check>Before finalizing the report: if traceability_gate_decision is BLOCKED or FAIL and traceability_complete is PASS, this is a self-contradiction. Fix traceability_complete to FAIL and either set status to FAIL, or set status to CONDITIONAL PASS with an explicit justification note (e.g., "Planned test coverage is ~100% but test implementation is {N}% — tests will be implemented during sprint development").</check>
     Then detailed findings for each gate.
     Include a "## Contradictions" section listing each detected contradiction:
     | ID | Type | Source Artifacts | Severity | Authority | Description | Recommended Resolution |
