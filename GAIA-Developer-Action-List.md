@@ -22,7 +22,7 @@
 |-------|-------|-------|-----------|
 | A. Systemic: Next-Step Suggestions | 14 | 14 | 0 |
 | B. Systemic: Normal Mode Pause | 4 | 4 | 0 |
-| C. Systemic: Unregistered Commands | 4 | 2 | 2 |
+| C. Systemic: Unregistered Commands | 4 | 3 | 1 |
 | D. Systemic: Wrong Output Directory | 6 | 0 | 6 |
 | E. Systemic: Story Naming Convention | 3 | 3 | 0 |
 | F. Dev-Story Cluster | 6 | 0 | 6 |
@@ -32,7 +32,7 @@
 | J. Individual High-Severity Bugs | 8 | 0 | 8 |
 | K. Individual Medium-Severity Bugs | 28 | 0 | 28 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **23** | **99** |
+| **TOTAL** | **122** | **24** | **98** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -144,8 +144,8 @@
 - [x] **BUG-100** (High) — `/gaia-add-stories` command file missing
   - Fix: Created `.claude/commands/gaia-add-stories.md` pointing to the add-stories workflow
 
-- [ ] **BUG-102** (High) — `/gaia-performance-review` command not registered
-  - Fix: Create `.claude/commands/gaia-performance-review.md` pointing to the performance review workflow
+- [x] **BUG-102** (High) — `/gaia-check-dod` command not registered — Definition of Done enforcement inaccessible
+  - Fix: Created full check-dod workflow + `.claude/commands/gaia-check-dod.md` + lifecycle-sequence entry
 
 - [ ] **BUG-103** (High) — `/gaia-test-framework` command not registered
   - Fix: Create `.claude/commands/gaia-test-framework.md` pointing to the test-framework workflow

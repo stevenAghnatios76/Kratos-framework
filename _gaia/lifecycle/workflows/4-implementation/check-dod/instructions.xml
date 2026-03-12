@@ -1,0 +1,54 @@
+<workflow name="check-dod">
+<critical>
+  <mandate>This is a validation check — do NOT modify story status or sprint-status.yaml</mandate>
+  <mandate>Report results by appending a DoD Check Report section to the story file</mandate>
+  <mandate>Use glob {story_key}-*.md to find the story file</mandate>
+</critical>
+<step n="1" title="Load Story">
+  <ask>Which story to check? (provide story key, e.g., E1-S1)</ask>
+  <action>Find and read the story file matching {story_key}-*.md in {implementation_artifacts}/</action>
+  <action>Verify story status is 'in-progress' or 'review' — HALT if story is in backlog, validating, ready-for-dev, or done</action>
+  <action>Read the story template from {project-root}/_gaia/lifecycle/templates/story-template.md for reference on expected sections</action>
+</step>
+<step n="2" title="Check Implicit DoD Criteria">
+  <action>Check: All acceptance criteria are marked complete (- [x]) in the "Acceptance Criteria" section. Count total vs checked.</action>
+  <action>Check: All tasks and subtasks are marked complete (- [x]) in the "Tasks / Subtasks" section. Count total vs checked.</action>
+  <action>Check: Test Scenarios table is populated (at least one non-placeholder row)</action>
+  <action>Check: Dev Agent Record section has content (agent, files changed list populated)</action>
+</step>
+<step n="3" title="Check Explicit DoD Items">
+  <action>Read the "Definition of Done" section of the story file</action>
+  <action>For each checkbox item: record whether it is checked (- [x]) or unchecked (- [ ])</action>
+  <action>If the DoD section only contains the template placeholder "Define all the Definition of Done" — report WARNING: DoD items were never defined for this story</action>
+</step>
+<step n="4" title="Generate DoD Check Report">
+  <action>Determine overall verdict: PASS (all implicit + explicit items checked) or FAIL (any unchecked)</action>
+  <action>Append DoD Check Report at the END of the story file, after a horizontal rule (---) separator</action>
+  <template-output file="{implementation_artifacts}/{story_key}-{story_title_slug}.md">
+    Append a section titled "## DoD Check Report" at the very end of the story file, preceded by a --- separator. Include:
+    - Date of check
+    - Overall verdict: PASS or FAIL
+    - Implicit criteria results table:
+
+    | Criterion | Status | Details |
+    |-----------|--------|---------|
+    | Acceptance Criteria | n/m checked | list unchecked if any |
+    | Subtasks | n/m checked | list unchecked if any |
+    | Test Scenarios | populated/empty | — |
+    | Dev Agent Record | populated/empty | — |
+
+    - Explicit DoD items results table:
+
+    | # | Item | Status |
+    |---|------|--------|
+    | 1 | {item text} | PASS/FAIL |
+
+    - If FAIL: list all unchecked items and recommend actions
+    - If PASS: confirm story is ready for review gate (/gaia-run-all-reviews)
+  </template-output>
+  <next-step>
+    <on_pass>/gaia-run-all-reviews — Start the review gate</on_pass>
+    <on_fail>/gaia-dev-story — Resume implementation to address unchecked DoD items</on_fail>
+  </next-step>
+</step>
+</workflow>

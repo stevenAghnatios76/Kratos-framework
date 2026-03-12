@@ -1,0 +1,19 @@
+name: check-dod
+description: 'Check Definition of Done criteria for a story before review transition'
+module: lifecycle
+agent: sm
+config_resolved: "{project-root}/_gaia/lifecycle/.resolved/check-dod.yaml"
+config_source: "{project-root}/_gaia/lifecycle/config.yaml"
+installed_path: "{project-root}/_gaia/lifecycle/workflows/4-implementation/check-dod"
+instructions: "{installed_path}/instructions.xml"
+validation: "{installed_path}/checklist.md"
+quality_gates:
+  pre_start:
+    - check: "story_status in ['in-progress', 'review']"
+      on_fail: "HALT: Story must be in-progress or review status to check DoD"
+on_error:
+  missing_file: "ask_user"
+  unresolved_variable: "halt"
+
+output:
+  primary: "{implementation_artifacts}/{story_key}-{story_title_slug}.md"

@@ -162,10 +162,19 @@ sequence:
     phase: 4-implementation
     command: /gaia-dev-story
     next:
-      primary: /gaia-run-all-reviews
+      primary: /gaia-check-dod
       alternatives:
+        - command: /gaia-run-all-reviews
+          context: "If DoD was already verified"
         - command: /gaia-code-review
           context: "To run individual code review first"
+
+  check-dod:
+    phase: 4-implementation
+    command: /gaia-check-dod
+    next:
+      on_pass: /gaia-run-all-reviews
+      on_fail: /gaia-dev-story
 
   code-review:
     phase: 4-implementation
