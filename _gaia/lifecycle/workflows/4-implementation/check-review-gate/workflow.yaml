@@ -1,0 +1,19 @@
+name: check-review-gate
+description: 'Check composite review gate status and transition story to done if all reviews pass'
+module: lifecycle
+agent: sm
+config_resolved: "{project-root}/_gaia/lifecycle/.resolved/check-review-gate.yaml"
+config_source: "{project-root}/_gaia/lifecycle/config.yaml"
+installed_path: "{project-root}/_gaia/lifecycle/workflows/4-implementation/check-review-gate"
+instructions: "{installed_path}/instructions.xml"
+validation: "{installed_path}/checklist.md"
+quality_gates:
+  pre_start:
+    - check: "story_status in ['review', 'done']"
+      on_fail: "HALT: Story must be in review or done status to check review gate"
+on_error:
+  missing_file: "ask_user"
+  unresolved_variable: "halt"
+
+output:
+  primary: "{implementation_artifacts}/{story_key}-{story_title_slug}.md"

@@ -203,6 +203,23 @@ sequence:
         - command: /gaia-dev-story
           context: "If security issues require code changes"
 
+  run-all-reviews:
+    phase: 4-implementation
+    command: /gaia-run-all-reviews
+    next:
+      primary: /gaia-check-review-gate
+      alternatives:
+        - command: /gaia-dev-story
+          context: "If any review failed and code changes are needed"
+
+  check-review-gate:
+    phase: 4-implementation
+    command: /gaia-check-review-gate
+    next:
+      on_all_passed: /gaia-sprint-status
+      on_failures: /gaia-dev-story
+      on_pending: /gaia-run-all-reviews
+
   change-request:
     phase: 4-implementation
     command: /gaia-change-request

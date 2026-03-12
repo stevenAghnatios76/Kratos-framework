@@ -22,7 +22,7 @@
 |-------|-------|-------|-----------|
 | A. Systemic: Next-Step Suggestions | 14 | 14 | 0 |
 | B. Systemic: Normal Mode Pause | 4 | 4 | 0 |
-| C. Systemic: Unregistered Commands | 4 | 3 | 1 |
+| C. Systemic: Unregistered Commands | 4 | 4 | 0 |
 | D. Systemic: Wrong Output Directory | 6 | 0 | 6 |
 | E. Systemic: Story Naming Convention | 3 | 3 | 0 |
 | F. Dev-Story Cluster | 6 | 0 | 6 |
@@ -32,7 +32,7 @@
 | J. Individual High-Severity Bugs | 8 | 0 | 8 |
 | K. Individual Medium-Severity Bugs | 28 | 0 | 28 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **24** | **98** |
+| **TOTAL** | **122** | **25** | **97** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -147,8 +147,8 @@
 - [x] **BUG-102** (High) — `/gaia-check-dod` command not registered — Definition of Done enforcement inaccessible
   - Fix: Created full check-dod workflow + `.claude/commands/gaia-check-dod.md` + lifecycle-sequence entry
 
-- [ ] **BUG-103** (High) — `/gaia-test-framework` command not registered
-  - Fix: Create `.claude/commands/gaia-test-framework.md` pointing to the test-framework workflow
+- [x] **BUG-103** (High) — `/gaia-check-review-gate` command not registered — composite gate check inaccessible
+  - Fix: Created full check-review-gate workflow + `.claude/commands/gaia-check-review-gate.md` + lifecycle-sequence entries
 
 ---
 

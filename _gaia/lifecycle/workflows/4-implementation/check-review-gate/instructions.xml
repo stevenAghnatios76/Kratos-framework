@@ -1,0 +1,53 @@
+<workflow name="check-review-gate">
+<critical>
+  <mandate>Do NOT re-run any reviews — this workflow only inspects the current Review Gate state</mandate>
+  <mandate>Do NOT write to sprint-status.yaml — story file frontmatter is the source of truth</mandate>
+  <mandate>Use the shared protocol at {project-root}/_gaia/core/protocols/review-gate-check.xml for gate evaluation</mandate>
+  <mandate>Use glob {story_key}-*.md to find the story file</mandate>
+</critical>
+<step n="1" title="Load Story">
+  <ask>Which story to check? (provide story key, e.g., E1-S1)</ask>
+  <action>Find and read the story file matching {story_key}-*.md in {implementation_artifacts}/</action>
+  <action>Verify story status is 'review' or 'done' — HALT if story is in any other status</action>
+</step>
+<step n="2" title="Evaluate Review Gate">
+  <action>Load and execute the shared protocol: {project-root}/_gaia/core/protocols/review-gate-check.xml</action>
+  <action>Parse the Review Gate table — verify exactly 6 rows exist (Code Review, QA Tests, Security Review, Test Automation, Test Review, Performance Review)</action>
+  <action>Classify each row as PASSED, FAILED, or PENDING</action>
+  <action>If any row is missing or has an invalid status, flag it as an error</action>
+</step>
+<step n="3" title="Execute Gate Transition">
+  <action>If ALL 6 rows PASSED AND all Definition of Done items checked AND story status is 'review': transition story status to 'done' in story file frontmatter ONLY</action>
+  <action>If ALL 6 rows PASSED but DoD incomplete: log "BLOCKED: DoD incomplete" — do NOT transition</action>
+  <action>If ALL 6 rows PASSED AND story already 'done': log "Story already done. No update needed."</action>
+  <action>If any row FAILED or PENDING: do NOT change story status</action>
+</step>
+<step n="4" title="Generate Gate Status Report">
+  <action>Append Gate Status Report at the END of the story file, after a horizontal rule (---) separator</action>
+  <template-output file="{implementation_artifacts}/{story_key}-{story_title_slug}.md">
+    Append a section titled "## Review Gate Status Report" at the very end of the story file, preceded by a --- separator. Include:
+    - Date of check
+    - Overall verdict: ALL PASSED | HAS FAILURES | HAS PENDING
+    - Gate summary table:
+
+    | Review | Status | Report |
+    |--------|--------|--------|
+    | Code Review | PASSED/FAILED/PENDING | link or — |
+    | QA Tests | PASSED/FAILED/PENDING | link or — |
+    | Security Review | PASSED/FAILED/PENDING | link or — |
+    | Test Automation | PASSED/FAILED/PENDING | link or — |
+    | Test Review | PASSED/FAILED/PENDING | link or — |
+    | Performance Review | PASSED/FAILED/PENDING | link or — |
+
+    - Transition result: what action was taken (transitioned to done / blocked by DoD / no change)
+    - If FAILED: list failed reviews and recommend re-running them individually
+    - If PENDING: list pending reviews and recommend running them or /gaia-run-all-reviews
+    - If ALL PASSED: confirm story is done
+  </template-output>
+  <next-step>
+    <on_all_passed>Story is done — proceed to /gaia-sprint-status to update sprint tracking</on_all_passed>
+    <on_failures>Re-run failed reviews individually, then run /gaia-check-review-gate again</on_failures>
+    <on_pending>Run /gaia-run-all-reviews to complete remaining reviews</on_pending>
+  </next-step>
+</step>
+</workflow>
