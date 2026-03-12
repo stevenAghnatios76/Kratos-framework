@@ -29,7 +29,7 @@ quality_gates:
       on_fail: "HALT: Brainstorm artifact not found at {planning_artifacts}/project-brainstorm.md. Run /gaia-brainstorm first."
   post_complete:
     - check: "product_brief_has_all_sections"
-      on_fail: "HALT: Product brief must include: vision, target users, problem statement, proposed solution, success metrics"
+      on_fail: "HALT: Product brief must include all sections: Vision Statement, Target Users, Problem Statement, Proposed Solution, Key Features, Scope and Boundaries, Risks and Assumptions, Competitive Landscape, Success Metrics"
 on_error:
   missing_file: "ask_user"
   unresolved_variable: "halt"

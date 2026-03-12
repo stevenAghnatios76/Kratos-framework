@@ -30,9 +30,9 @@
 | H. Run-All-Reviews Cluster | 5 | 5 | 0 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 18 | 0 |
 | J. Individual High-Severity Bugs | 8 | 6 | 2 |
-| K. Individual Medium-Severity Bugs | 28 | 1 | 27 |
+| K. Individual Medium-Severity Bugs | 28 | 2 | 26 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **73** | **49** |
+| **TOTAL** | **122** | **74** | **48** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -381,8 +381,8 @@ Bugs not already covered in systemic groups.
 - [x] **BUG-002** (Medium) — `/gaia-brainstorm` doesn't save creative divergent ideas that were deprioritized
   - Fix: Added "Parking Lot" action to Step 4 (Opportunity Synthesis) to capture deprioritized ideas with reasoning and revival conditions. Updated Step 5 template-output to include Parking Lot section.
 
-- [ ] **BUG-008** (Medium) — `/gaia-product-brief` output structure inconsistent with downstream expectations
-  - Fix: Align output template sections with what `create-prd` expects to load
+- [x] **BUG-008** (Medium) — `/gaia-product-brief` output structure inconsistent with downstream expectations
+  - Fix: Added explicit section headings to template-output (Vision, Target Users, Problem Statement, Proposed Solution, Key Features, Scope and Boundaries, Risks and Assumptions, Competitive Landscape, Success Metrics). Added new Step 6 for scope/risks/competitive landscape. Updated post_complete gate to list all required sections.
 
 ### Phase 2 — Planning
 

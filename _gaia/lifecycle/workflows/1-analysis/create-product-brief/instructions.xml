@@ -30,13 +30,28 @@
   <action>Key features and differentiators</action>
   <action>Reference technical research for technology selection rationale if available</action>
 </step>
-<step n="6" title="Success Metrics">
+<step n="6" title="Scope, Risks and Competitive Landscape">
+  <action>Define what is in-scope for this product and what is explicitly out of scope</action>
+  <action>Document known risks, dependencies, and assumptions the solution depends on</action>
+  <action>Summarize competitive landscape from upstream brainstorm and market research — key competitors, positioning, and differentiation</action>
+</step>
+<step n="7" title="Success Metrics">
   <action>Define measurable KPIs and success criteria</action>
   <action>Include both quantitative and qualitative metrics</action>
 </step>
-<step n="7" title="Generate Output">
+<step n="8" title="Generate Output">
   <template-output file="{planning_artifacts}/product-brief.md">
-    Generate product brief with: vision, target users/personas, problem statement, proposed solution, key features, success metrics, and next steps.
+    Generate product brief with these exact sections:
+    ## Vision Statement — core product vision
+    ## Target Users — user personas (name, role, goals, pain points, context for each)
+    ## Problem Statement — core problem being solved, grounded in research
+    ## Proposed Solution — high-level solution approach
+    ## Key Features — feature list with differentiators
+    ## Scope and Boundaries — what is in-scope and what is explicitly out of scope
+    ## Risks and Assumptions — known risks, dependencies, and assumptions
+    ## Competitive Landscape — summary of competitive positioning from upstream research
+    ## Success Metrics — measurable KPIs and success criteria
+    ## Next Steps — per lifecycle-sequence.yaml
   </template-output>
 </step>
 </workflow>
