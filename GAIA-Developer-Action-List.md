@@ -27,12 +27,12 @@
 | E. Systemic: Story Naming Convention | 3 | 3 | 0 |
 | F. Dev-Story Cluster | 6 | 4 | 2 |
 | G. Brownfield Cluster | 8 | 0 | 8 |
-| H. Run-All-Reviews Cluster | 5 | 4 | 1 |
+| H. Run-All-Reviews Cluster | 5 | 5 | 0 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 0 | 18 |
 | J. Individual High-Severity Bugs | 8 | 6 | 2 |
 | K. Individual Medium-Severity Bugs | 28 | 0 | 28 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **45** | **77** |
+| **TOTAL** | **122** | **46** | **76** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -275,8 +275,8 @@
 - [x] **BUG-088** (Medium) — Epic status workflow skips dependency analysis entirely (corrected from action list description)
   - Fix: Added Step 4 (Dependency Analysis) to epic-status — reads dependencies from story frontmatter, builds cross-epic graph, identifies blocked stories, calculates critical path. Dashboard includes dependency section.
 
-- [ ] **BUG-089** (Low) — No timeout handling for individual review subagents
-  - Fix: Add per-review timeout (configurable, default 5 min) with graceful fallback
+- [x] **BUG-089** (Low) — Epic status "Remaining" column is misleading (corrected from action list description)
+  - Fix: Replaced "remaining" with explicit columns: Total | Done | In Progress | Review | Blocked | Backlog | Completion %. Backlog = stories not yet started.
 
 ---
 

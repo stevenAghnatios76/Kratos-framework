@@ -34,7 +34,7 @@
 </step>
 <step n="5" title="Generate Dashboard">
   <action>Load template from {project-root}/_gaia/lifecycle/templates/epic-status-template.md</action>
-  <action>Fill summary table with per-epic row: story count, done, in-progress, remaining, completion %</action>
+  <action>Fill summary table with per-epic row: Total | Done | In Progress | Review | Blocked | Backlog | Completion %. Backlog = stories not yet started (no file, or status is backlog/ready-for-dev/validating). Do NOT use "Remaining" (total - done) as it overlaps with In Progress.</action>
   <action>Fill per-epic detail sections with ASCII progress bar and story-level status table</action>
   <action>ASCII progress bar: use filled blocks (█) for done, light blocks (░) for remaining, 20 chars wide</action>
   <action>Fill untracked stories section</action>
