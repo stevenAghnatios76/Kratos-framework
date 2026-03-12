@@ -30,9 +30,9 @@
 | H. Run-All-Reviews Cluster | 5 | 5 | 0 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 18 | 0 |
 | J. Individual High-Severity Bugs | 8 | 6 | 2 |
-| K. Individual Medium-Severity Bugs | 28 | 9 | 19 |
+| K. Individual Medium-Severity Bugs | 28 | 10 | 18 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **81** | **41** |
+| **TOTAL** | **122** | **82** | **40** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -409,8 +409,8 @@ Bugs not already covered in systemic groups.
 - [x] **BUG-022** (Medium) — `/gaia-create-arch` no ADR (Architecture Decision Record) format
   - Fix: Replaced loose format hint with enforced ADR template: ADR-{NNN} numbering, Status (Proposed/Accepted/Deprecated/Superseded/Existing), Context, Decision, Alternatives Considered, Consequences, Addresses (FR/NFR IDs).
 
-- [ ] **BUG-023** (Medium) — `/gaia-create-arch` missing scalability analysis
-  - Fix: Add scalability section referencing NFR performance/scalability targets
+- [x] **BUG-023** (Medium) — `/gaia-ci-setup` does not ask user for CI platform preference (auto-detects without confirmation)
+  - Fix: Added `<ask>` tag in Step 1 requiring user to confirm/choose CI platform. Updated checklist to require user confirmation, not just auto-detection.
 
 - [ ] **BUG-025** (Medium) — `/gaia-create-arch` technology selection not justified
   - Fix: Each tech choice needs a "Why chosen" + "Alternatives considered" section

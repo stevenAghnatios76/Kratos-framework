@@ -3,7 +3,10 @@
   <mandate>Quality gates must be enforced, not advisory</mandate>
 </critical>
 <step n="1" title="Detect CI Platform">
-  <action>Identify: GitHub Actions, GitLab CI, Jenkins, or other</action>
+  <action>Scan for existing CI config files: .github/workflows/, .gitlab-ci.yml, Jenkinsfile, .circleci/config.yml</action>
+  <action>If config found: note detected platform and present finding to user</action>
+  <action>If no config found: note that no existing CI platform was detected</action>
+  <ask>Which CI platform would you like to use? Options: GitHub Actions, GitLab CI, Jenkins, CircleCI, or other. {If detected: "Detected: {platform} — recommended based on existing config."}</ask>
 </step>
 <step n="2" title="Define Pipeline">
   <action>Build > lint > test > coverage > deploy gates</action>

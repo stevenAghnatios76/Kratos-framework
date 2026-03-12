@@ -19,6 +19,6 @@ modules:
     path: "_gaia/creative"
     type: built-in
   - name: testing
-    version: "1.5.6"
+    version: "1.5.7"
     path: "_gaia/testing"
     type: built-in
