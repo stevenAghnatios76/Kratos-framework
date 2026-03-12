@@ -14,11 +14,27 @@
 <step n="3" title="Quality Gates">
   <action>Define pass/fail thresholds: coverage %, test pass rate</action>
 </step>
-<step n="4" title="Generate Pipeline Config">
+<step n="4" title="Secrets Management">
+  <action>Identify all required secrets from architecture and PRD: API keys, database credentials, auth secrets, third-party service keys</action>
+  <action>Document how to add secrets to the selected CI platform (e.g., GitHub Repository Secrets, GitLab CI/CD Variables)</action>
+  <action>Define environment-level separation: which secrets differ between staging and production</action>
+  <action>List each secret with its name, purpose, and which pipeline stages need it</action>
+</step>
+<step n="5" title="Deployment Strategy">
+  <action>Define staging deployment: auto-deploy on merge to develop branch after all gates pass</action>
+  <action>Define production deployment: deploy on merge to main with manual approval gate</action>
+  <action>Define rollback procedure: how to revert a failed deployment (rollback trigger, steps, verification)</action>
+</step>
+<step n="6" title="Monitoring and Notifications">
+  <action>Configure pipeline failure notifications: Slack webhook, email, or platform-native alerts</action>
+  <action>Add pipeline status badge for the project README</action>
+  <action>Recommend metrics dashboard for pipeline health (run duration trends, failure rates, flaky test tracking)</action>
+</step>
+<step n="7" title="Generate Pipeline Config">
   <action>Generate CI config file (.github/workflows/ci.yml or equivalent)</action>
 </step>
-<step n="5" title="Generate Output">
-  <action>Generate CI pipeline configuration document with quality gates</action>
+<step n="8" title="Generate Output">
+  <action>Generate CI/CD pipeline configuration document with: pipeline stages, quality gates, secrets management, deployment strategy, and monitoring setup</action>
   <template-output file="{test_artifacts}/ci-setup.md" />
 </step>
 <next-step source="lifecycle-sequence.yaml">

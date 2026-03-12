@@ -30,9 +30,9 @@
 | H. Run-All-Reviews Cluster | 5 | 5 | 0 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 18 | 0 |
 | J. Individual High-Severity Bugs | 8 | 6 | 2 |
-| K. Individual Medium-Severity Bugs | 28 | 10 | 18 |
+| K. Individual Medium-Severity Bugs | 28 | 11 | 17 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **82** | **40** |
+| **TOTAL** | **122** | **83** | **39** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -412,8 +412,8 @@ Bugs not already covered in systemic groups.
 - [x] **BUG-023** (Medium) — `/gaia-ci-setup` does not ask user for CI platform preference (auto-detects without confirmation)
   - Fix: Added `<ask>` tag in Step 1 requiring user to confirm/choose CI platform. Updated checklist to require user confirmation, not just auto-detection.
 
-- [ ] **BUG-025** (Medium) — `/gaia-create-arch` technology selection not justified
-  - Fix: Each tech choice needs a "Why chosen" + "Alternatives considered" section
+- [x] **BUG-025** (Medium) — `/gaia-ci-setup` document missing secrets management, deployment strategy, and monitoring/notifications
+  - Fix: Added 3 new steps to instructions.xml: Secrets Management (Step 4), Deployment Strategy (Step 5), Monitoring & Notifications (Step 6). Updated checklist with corresponding items.
 
 - [ ] **BUG-027** (Medium) — `/gaia-test-design` missing test environment requirements
   - Fix: Add section for test environment setup, test data strategy, and CI requirements
