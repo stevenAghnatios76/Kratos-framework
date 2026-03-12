@@ -33,6 +33,7 @@
   <action>If no story files contain dependency metadata: note "No dependency data available — add `dependencies` field to story frontmatter for cross-epic tracking." Skip blocked story and critical path calculations.</action>
 </step>
 <step n="5" title="Generate Dashboard">
+  <action>Format dashboard with standard header: "## Epic Status Dashboard — {date}" followed by summary line: "Epics: {complete}/{total} complete | Stories: {done}/{total} ({pct}%) | At Risk: {blocked_count}"</action>
   <action>Load template from {project-root}/_gaia/lifecycle/templates/epic-status-template.md</action>
   <action>Fill summary table with per-epic row: Total | Done | In Progress | Review | Blocked | Backlog | Completion %. Backlog = stories not yet started (no file, or status is backlog/ready-for-dev/validating). Do NOT use "Remaining" (total - done) as it overlaps with In Progress.</action>
   <action>Fill per-epic detail sections with ASCII progress bar and story-level status table</action>

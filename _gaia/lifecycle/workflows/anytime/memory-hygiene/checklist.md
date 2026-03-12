@@ -12,6 +12,7 @@ validation-target: 'Memory hygiene report'
 - [ ] Available reference artifacts loaded (architecture.md, prd.md, test-plan.md, etc.)
 - [ ] Each sidecar entry compared against its reference artifact
 - [ ] Each entry classified as ACTIVE, STALE, CONTRADICTED, or ORPHANED
+- [ ] Orphaned and renamed artifact references detected and reported
 
 ## User Actions
 - [ ] All flagged entries presented to user with evidence

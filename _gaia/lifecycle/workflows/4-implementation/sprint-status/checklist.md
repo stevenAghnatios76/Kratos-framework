@@ -6,6 +6,7 @@ validation-target: 'Sprint status display'
 - [ ] Each story's sprint-status.yaml entry compared with story file frontmatter
 - [ ] Divergent statuses corrected (story file wins)
 - [ ] Reconciliation changes logged
+- [ ] Reconciliation changes displayed to user before status display
 ## Display
 - [ ] All stories shown with current status
 - [ ] Blocked stories highlighted

@@ -15,8 +15,10 @@
   <action>If a story file has all 6 Review Gate rows PASSED and status 'done' but sprint-status.yaml still shows 'review': update sprint-status.yaml to 'done'</action>
   <action>Log any reconciliation changes: "Reconciled {story_key}: {old_status} → {new_status} (synced from story file)"</action>
   <action>If any discrepancies were found and reconciled: write a reconciliation report to {implementation_artifacts}/sprint-reconciliation-{date}.md containing: reconciliation timestamp, total stories checked, each discrepancy (story key, old status, new status, source: "story file frontmatter"), and a summary line. If no discrepancies were found, skip writing — no report needed when everything is in sync.</action>
+  <action>After reconciliation: display a change summary to the user before proceeding — for each reconciled story show "{story_key}: {old_status} → {new_status}". If no changes were made, display "All statuses in sync — no reconciliation needed."</action>
 </step>
 <step n="3" title="Display Status">
+  <action>Format output with standard header: "## Sprint Status — {sprint_id} | {date}" followed by summary line: "Progress: {done}/{total} stories ({pct}%) | {points_done}/{total_points} points | Blocked: {blocked_count}"</action>
   <action>Show stories grouped by status in a table</action>
   <action>Highlight blocked stories with blocking reason</action>
   <action>Show progress: done/total, percentage complete</action>

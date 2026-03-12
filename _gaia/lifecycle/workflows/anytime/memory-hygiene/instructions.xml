@@ -53,6 +53,7 @@
     - storyteller-sidecar: SKIP — creative log, no decisions to validate.</action>
   <action>If a sidecar's reference artifact is missing: flag all its entries as "UNVERIFIABLE —
     reference artifact not found" and note which artifact would be needed</action>
+  <action>For all sidecars: scan each entry for references to specific component names, service names, or artifact filenames. Cross-reference against current artifact content. If a referenced name does not appear in any current artifact, flag as potential ORPHANED or RENAMED. For RENAMED candidates: search for semantically similar names in current artifacts and suggest the likely rename (e.g., "auth-service → identity-service?").</action>
 </step>
 
 <step n="4" title="Classify Entries">

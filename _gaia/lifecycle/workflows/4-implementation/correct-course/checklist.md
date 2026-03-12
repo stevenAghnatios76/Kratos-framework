@@ -14,5 +14,8 @@ validation-target: 'Updated sprint plan'
 - [ ] Injected stories exist in epics-and-stories.md
 - [ ] Velocity impact assessed
 - [ ] Story file creation recommended for new stories
+## Action Item Tracking
+- [ ] Action items persisted to sprint-status.yaml with tracking fields (id, description, assigned_to, due_date, status)
+- [ ] Existing correction_action_items preserved (append only)
 ## Change Request (if applicable)
 - [ ] Change request record updated with sprint assignment

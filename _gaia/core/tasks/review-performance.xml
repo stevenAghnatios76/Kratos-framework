@@ -12,24 +12,32 @@
     <action>Ask user for code to review</action>
     <action>Read the target files</action>
   </step>
-  <step n="2" title="Database Performance">
+  <step n="2" title="Baseline Metrics">
+    <action>Search for previous performance review reports in {test_artifacts}/performance-review-*.md</action>
+    <action>If a previous report exists: extract baseline metrics (response times, query counts, memory usage, payload sizes) to use as comparison benchmarks</action>
+    <action>If no previous report exists: establish initial baseline by documenting current observable performance characteristics (endpoint response times, database query counts per operation, memory footprint, payload sizes) — label these as "Initial Baseline"</action>
+    <action>Record baseline metrics for comparison in the final report</action>
+  </step>
+  <step n="3" title="Database Performance">
     <action>Check for N+1 queries</action>
     <action>Identify missing indexes and inefficient queries</action>
     <action>Review database connection pooling</action>
   </step>
-  <step n="3" title="Runtime Performance">
+  <step n="4" title="Runtime Performance">
     <action>Identify blocking operations and synchronous bottlenecks</action>
     <action>Check for memory leaks, large allocations</action>
     <action>Flag unoptimized loops and redundant computations</action>
   </step>
-  <step n="4" title="Network and Payload">
+  <step n="5" title="Network and Payload">
     <action>Check for large payloads, missing pagination</action>
     <action>Review caching strategy</action>
     <action>Identify unnecessary API calls or round trips</action>
   </step>
-  <step n="5" title="Report">
+  <step n="6" title="Report">
     <template-output file="{test_artifacts}/performance-review-{date}.md">
-      Generate performance review report with findings by category (database, runtime, network/payload), severity levels, impact estimates, and fix suggestions.
+      Generate performance review report with:
+      - Findings by category (database, runtime, network/payload), severity levels, impact estimates, and fix suggestions
+      - Baseline Comparison section: if previous report exists, show before/after metrics for each category; if first run, show "Initial Baseline Established" with current metrics recorded for future comparison
     </template-output>
   </step>
 </flow>

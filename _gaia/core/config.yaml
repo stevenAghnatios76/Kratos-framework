@@ -2,7 +2,7 @@
 inherits: "{project-root}/_gaia/_config/global.yaml"
 
 module_name: "core"
-module_version: "1.7.5"
+module_version: "1.7.6"
 
 engine_path: "{project-root}/_gaia/core/engine/workflow.xml"
 tasks_path: "{project-root}/_gaia/core/tasks"

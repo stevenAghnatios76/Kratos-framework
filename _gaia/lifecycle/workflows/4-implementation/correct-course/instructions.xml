@@ -32,9 +32,12 @@
   <action>  Or: create minimal entry in sprint-status.yaml with status 'backlog'</action>
 </step>
 <step n="6" title="Generate Updated Plan">
+  <action>Format change summary with standard header: "## Course Correction — {date}" followed by summary line: "Change Type: {type} | Stories Affected: {count} | Velocity Impact: {delta} points"</action>
   <action>Update sprint plan document</action>
   <action>Update sprint-status.yaml with changes — include any newly injected stories</action>
   <action>Log course correction reason, CR ID (if applicable), and changes made</action>
+  <action>Extract all action items from the course correction. For each action item record: description, responsible agent or role, target date, status (open). Write these to sprint-status.yaml under a `correction_action_items` list. Each entry: {id: CA-{NNN}, description, assigned_to, due_date, status: open}.</action>
+  <action>If sprint-status.yaml already has a `correction_action_items` section: append new items, do not overwrite existing ones.</action>
   <template-output file="{implementation_artifacts}/sprint-status.yaml">
     Update sprint plan and status files with course correction changes and rationale.
   </template-output>
