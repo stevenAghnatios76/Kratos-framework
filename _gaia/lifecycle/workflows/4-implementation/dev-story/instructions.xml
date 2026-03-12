@@ -2,6 +2,7 @@
 <critical>
   <mandate>Story must be in ready-for-dev status before starting</mandate>
   <mandate>Follow TDD cycle: red, green, refactor</mandate>
+  <mandate>TDD phases MUST be executed as separate, sequential steps — NEVER combine them. Do NOT write implementation code during the Red phase. Do NOT skip the Refactor phase. Each phase must produce its own checkpoint and wait for user confirmation before the next phase begins.</mandate>
   <mandate>Write checkpoint after each subtask completes</mandate>
   <mandate>All tests must pass before marking complete</mandate>
 </critical>
@@ -38,16 +39,26 @@
   <ask>Here is the implementation plan with files to create/modify. Confirm to proceed, or request changes. [confirm / revise]</ask>
 </step>
 <step n="6" title="TDD Red Phase — Write Failing Tests">
+  <critical>
+    <mandate>RED PHASE ONLY: Write test files ONLY — do NOT write any implementation code in this step. Tests must define expected behavior and FAIL because the implementation does not exist yet.</mandate>
+  </critical>
   <action>For each subtask: write failing test(s) that define expected behavior (RED)</action>
   <action>Run the test suite — verify all new tests FAIL</action>
+  <check if="any_new_test_passes">Tests should NOT pass yet — no implementation exists. If a test passes without implementation, it is vacuous and must be rewritten to actually test behavior.</check>
   <action>Update files_touched in checkpoint</action>
   <template-output file="{implementation_artifacts}/{story_key}-tdd-progress.md">
-    RED phase complete. Summary: test files created, test names, what each validates, confirmation all new tests fail.
+    RED phase complete. Summary: test files created, test names, what each validates, confirmation all new tests fail. Include test runner output showing failures.
   </template-output>
+  <ask>Red phase complete — tests written and all failing as expected. Review test output above. [proceed to Green phase / revise tests]</ask>
 </step>
 <step n="7" title="TDD Green Phase — Implement to Pass">
+  <critical>
+    <mandate>GREEN PHASE: Write the MINIMUM implementation code needed to make failing tests pass. Do NOT write final/polished code — that is for the Refactor phase.</mandate>
+  </critical>
+  <check if="red_phase_not_complete">HALT: Red phase template-output must be saved before starting Green phase. Complete Step 6 first.</check>
   <action>For each subtask: implement minimum code to make failing tests pass (GREEN)</action>
   <action>Run the test suite — verify all tests PASS</action>
+  <check if="any_test_fails">HALT: All tests must pass before proceeding. Fix failing tests or implementation.</check>
   <action>Mark each completed subtask in story file</action>
   <action>Update files_touched in checkpoint</action>
   <action>Conditional checks — for each that applies:
@@ -55,16 +66,23 @@
     — If database schema changes: create reversible migration script (UP + DOWN)
     — If gradual rollout needed: implement feature flag wrapping new code path</action>
   <template-output file="{implementation_artifacts}/{story_key}-tdd-progress.md">
-    GREEN phase complete. Summary: files created/modified, all tests passing, any contract tests or migrations created.
+    GREEN phase complete. Summary: files created/modified, all tests passing, any contract tests or migrations created. Include test runner output showing all green.
   </template-output>
+  <ask>Green phase complete — all tests passing with minimal implementation. Review implementation above. [proceed to Refactor phase / revise implementation]</ask>
 </step>
 <step n="8" title="TDD Refactor Phase">
-  <action>Refactor implementation while keeping all tests green</action>
+  <critical>
+    <mandate>REFACTOR PHASE: Improve code quality, extract abstractions, decompose components, improve naming. Do NOT skip this step even if the Green phase code looks acceptable.</mandate>
+  </critical>
+  <check if="green_phase_not_complete">HALT: Green phase template-output must be saved before starting Refactor phase. Complete Step 7 first.</check>
+  <action>Refactor implementation while keeping all tests green: extract shared utilities, decompose large functions, improve naming, remove duplication</action>
   <action>Run the test suite — verify all tests still PASS after refactoring</action>
+  <check if="any_test_fails">HALT: Refactoring broke tests. Revert or fix before proceeding.</check>
   <action>Update files_touched in checkpoint</action>
   <template-output file="{implementation_artifacts}/{story_key}-tdd-progress.md">
-    REFACTOR phase complete. Summary: what was refactored, why, confirmation all tests still pass.
+    REFACTOR phase complete. Summary: what was refactored, why, confirmation all tests still pass. Include test runner output.
   </template-output>
+  <ask>Refactor phase complete — all tests still passing. Review refactored code. [proceed / continue refactoring]</ask>
 </step>
 <step n="9" title="Capture Findings">
   <action>Review any out-of-scope issues discovered during implementation (e.g., missing setup scripts, environment gaps, tech debt, broken tooling)</action>

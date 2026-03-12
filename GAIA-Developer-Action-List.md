@@ -25,14 +25,14 @@
 | C. Systemic: Unregistered Commands | 4 | 4 | 0 |
 | D. Systemic: Wrong Output Directory | 6 | 0 | 6 |
 | E. Systemic: Story Naming Convention | 3 | 3 | 0 |
-| F. Dev-Story Cluster | 6 | 1 | 5 |
+| F. Dev-Story Cluster | 6 | 2 | 4 |
 | G. Brownfield Cluster | 8 | 0 | 8 |
 | H. Run-All-Reviews Cluster | 5 | 0 | 5 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 0 | 18 |
 | J. Individual High-Severity Bugs | 8 | 0 | 8 |
 | K. Individual Medium-Severity Bugs | 28 | 0 | 28 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **26** | **96** |
+| **TOTAL** | **122** | **27** | **95** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -212,9 +212,8 @@
 - [x] **BUG-049** (High) — `/gaia-dev-story` pre-start gate doesn't validate story file exists + ATDD glob mismatch
   - Fix: Added story file existence gate to workflow.yaml. Fixed ATDD gate to search both epic-level and story-level patterns. Fixed ATDD variable naming.
 
-- [ ] **BUG-050** (High) — `/gaia-dev-story` TDD enforcement is inconsistent
-  - File: `dev-story/instructions.xml`
-  - Fix: If the story is tagged "TDD" or the project config requires TDD, enforce test-first workflow: write test → see it fail → implement → pass
+- [x] **BUG-050** (High) — `/gaia-dev-story` TDD enforcement is inconsistent
+  - Fix: Added critical mandates, `<check>` gates between phases, `<ask>` prompts for user confirmation, vacuous test detection
 
 - [ ] **BUG-051** (High) — Covered in Group B (normal mode pause)
 
