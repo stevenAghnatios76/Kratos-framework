@@ -125,9 +125,19 @@
     If checks were skipped (missing optional artifacts), list them as INFO notes.
   </template-output>
 </step>
-<step n="11" title="Optional: Adversarial Review">
-  <ask>Would you like to run an adversarial review on the readiness report? This spawns a subagent in a separate context. Strongly recommended before committing to build. (yes / skip)</ask>
-  <action>If yes: spawn a subagent using the Agent tool: "Load {project-root}/_gaia/core/tasks/review-adversarial.xml. Read its entire contents. Target: {planning_artifacts}/readiness-report.md. Follow the task instructions EXACTLY."</action>
-  <action>If skip: adversarial review can be run anytime later with /gaia-adversarial</action>
+<step n="11" title="Adversarial Review">
+  <action>Spawn a subagent using the Agent tool: "Load {project-root}/_gaia/core/tasks/review-adversarial.xml. Read its entire contents. Target: {planning_artifacts}/readiness-report.md. Follow the task instructions EXACTLY."</action>
+  <action>When subagent returns: verify adversarial review report exists at {planning_artifacts}/adversarial-review-*.md. If the subagent failed to write the file, the orchestrator MUST write it.</action>
+</step>
+<step n="12" title="Incorporate Adversarial Findings">
+  <action>Read the adversarial review report — extract all findings by severity (Critical, High, Medium, Low)</action>
+  <action>For each Critical/High finding: classify as contradiction (data conflicts between artifacts), omission (missing from artifact), misclassification (wrong severity/priority/status), or capacity/feasibility gap. Record which artifact needs to change, what section, and what the correction should be.</action>
+  <action>Update readiness-report.md:
+    - If ANY Critical findings: set status to FAIL
+    - Append a "## Adversarial Review Findings" section with all findings by severity
+    - Append a "## Required Fixes Before Proceeding" section listing each Critical/High finding with: finding ID, source artifact, section to fix, description of required change, responsible agent, and command to run</action>
+  <template-output file="{planning_artifacts}/readiness-report.md">
+    Update readiness report with adversarial findings incorporated, status adjusted if Critical findings exist, and required fixes listed with responsible agents and commands.
+  </template-output>
 </step>
 </workflow>

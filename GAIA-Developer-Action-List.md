@@ -28,11 +28,11 @@
 | F. Dev-Story Cluster | 6 | 4 | 2 |
 | G. Brownfield Cluster | 8 | 8 | 0 |
 | H. Run-All-Reviews Cluster | 5 | 5 | 0 |
-| I. Artifact Wiring Gaps (Issue Report) | 18 | 13 | 5 |
+| I. Artifact Wiring Gaps (Issue Report) | 18 | 14 | 4 |
 | J. Individual High-Severity Bugs | 8 | 6 | 2 |
 | K. Individual Medium-Severity Bugs | 28 | 0 | 28 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **67** | **55** |
+| **TOTAL** | **122** | **68** | **54** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -324,7 +324,8 @@
 
 ### Issue 6: Make adversarial review mandatory in readiness-check
 
-- [ ] **6** — `implementation-readiness/instructions.xml`: make Step 11 mandatory (remove `<ask>`), add Step 12 for findings incorporation (see Issue Report for full XML)
+- [x] **6** — `implementation-readiness/instructions.xml`: make Step 11 mandatory (remove `<ask>`), add Step 12 for findings incorporation (see Issue Report for full XML)
+  - Fix: Removed <ask> and "If skip" from Step 11 — adversarial review now spawns unconditionally. Added Step 12 to classify findings, update readiness report status (FAIL if Critical findings), and list required fixes with responsible agents.
 
 ### Issue 7: Redesign `/gaia-retro` as learning loop
 
