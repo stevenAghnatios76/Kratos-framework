@@ -8,6 +8,7 @@
   <mandate>Output must include machine-readable PASSED or FAILED verdict</mandate>
 </critical>
 <step n="1" title="Load Context">
+  <action>Resolve story file: search for {story_key}-*.md in {implementation_artifacts}/ using glob pattern to match the full filename ({story_key}-{title_slug}.md)</action>
   <action>Read the story file to understand what was built</action>
   <action>Read {planning_artifacts}/threat-model.md if available — understand applicable threats</action>
   <action>Identify code files changed or created by this story</action>
@@ -72,6 +73,7 @@
   <template-output file="{implementation_artifacts}/{story_key}-*.md">
     Update story file Review Gate table with security review result and report link.
   </template-output>
+  <action>Inform user: "Note: sprint-status.yaml may now be out of sync. Run /gaia-sprint-status to reconcile."</action>
   <invoke-protocol name="review-gate-check" file="{project-root}/_gaia/core/protocols/review-gate-check.xml" />
 </step>
 </workflow>

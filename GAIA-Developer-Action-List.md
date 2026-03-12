@@ -31,8 +31,8 @@
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 18 | 0 |
 | J. Individual High-Severity Bugs | 8 | 6 | 2 |
 | K. Individual Medium-Severity Bugs | 28 | 28 | 0 |
-| L. Individual Low-Severity Bugs | 18 | 5 | 13 |
-| **TOTAL** | **122** | **101** | **21** |
+| L. Individual Low-Severity Bugs | 18 | 10 | 8 |
+| **TOTAL** | **122** | **106** | **16** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -491,20 +491,20 @@ Documentation, cosmetic, and minor consistency issues.
 - [x] **BUG-071** (Low) — `/gaia-code-review` skips architecture conformance check — does not load architecture.md
   - Fix: Added Step 3b "Architecture Conformance" — loads architecture.md, verifies ADR conformance, layer boundaries, API patterns. Added input_file_patterns for architecture to workflow.yaml.
 
-- [ ] **BUG-072** (Low, downgraded from High) — Naming/formatting inconsistency in brownfield outputs
-  - Fix: Standardize section headings and formatting across all brownfield output files
+- [x] **BUG-072** (Low, downgraded from High) — `/gaia-code-review` maps REQUEST_CHANGES verdict to FAILED in Review Gate table
+  - Fix: Changed Step 7 to write REQUEST_CHANGES (not FAILED) in gate table, preserving verdict nuance.
 
-- [ ] **BUG-075** (Low) — `/gaia-brownfield` checklist completeness check missing
-  - Fix: Add final checklist validation step
+- [x] **BUG-075** (Medium) — Review workflows can't resolve story key to full filename — requires manual search
+  - Fix: Added glob-based story file resolution (`{story_key}-*.md`) to Step 1 of all 6 review workflows (code-review, security-review, qa-tests, test-review, test-automation, performance-review).
 
-- [ ] **BUG-077** (Low) — `/gaia-code-review` output format varies between runs
-  - Fix: Standardize review output template
+- [x] **BUG-077** (Low) — sprint-status.yaml becomes stale after failed review changes story status — no reconciliation notice
+  - Fix: Added "Run /gaia-sprint-status to reconcile" notice to the final step of all 6 review workflows.
 
-- [ ] **BUG-079** (Low) — `/gaia-security-review` findings not linked to threat model
-  - Fix: Cross-reference security findings with threat-model.md entries
+- [x] **BUG-079** (Low) — `/gaia-qa-tests` report uses non-standard test case ID format
+  - Fix: Added TC-{story_key}-{NNN} ID format requirement to Steps 3 and 4 with structured fields (ID, AC reference, Preconditions, Steps, Expected Result).
 
-- [ ] **BUG-080** (Low) — `/gaia-test-automate` generated tests don't follow project conventions
-  - Fix: Detect project test conventions (naming, structure) and follow them
+- [x] **BUG-080** (Low) — `/gaia-test-automate` report filename doesn't include story key — collisions on multiple stories
+  - Fix: Changed output from `automation-report.md` to `{story_key}-test-automation.md` in both instructions.xml and workflow.yaml.
 
 - [ ] **BUG-081** (Low) — `/gaia-test-review` coverage report incomplete
   - Fix: Include untested paths and edge cases in coverage analysis

@@ -1,6 +1,6 @@
 # GAIA — Generative Agile Intelligence Architecture
 
-[![Framework](https://img.shields.io/badge/framework-v1.27.49-blue)]()
+[![Framework](https://img.shields.io/badge/framework-v1.27.50-blue)]()
 [![License](https://img.shields.io/badge/license-AGPL--3.0-green)]()
 [![Agents](https://img.shields.io/badge/agents-25-purple)]()
 [![Workflows](https://img.shields.io/badge/workflows-64-orange)]()

@@ -6,6 +6,7 @@
   <mandate>Output must include machine-readable PASSED or FAILED verdict</mandate>
 </critical>
 <step n="1" title="Load Story and Code">
+  <action>Resolve story file: search for {story_key}-*.md in {implementation_artifacts}/ using glob pattern to match the full filename ({story_key}-{title_slug}.md)</action>
   <action>Read story file, identify files changed and acceptance criteria</action>
   <action>Read implemented code files</action>
 </step>
@@ -30,7 +31,7 @@
 </step>
 <step n="7" title="Generate Report">
   <action>Generate automation report with coverage gaps filled and test results</action>
-  <template-output file="{test_artifacts}/automation-report.md">
+  <template-output file="{test_artifacts}/{story_key}-test-automation.md">
     Generate automation report with coverage gaps filled, test results, and machine-readable verdict (PASSED/FAILED).
   </template-output>
 </step>
@@ -41,6 +42,7 @@
   <template-output file="{implementation_artifacts}/{story_key}-*.md">
     Update story file Review Gate table with test automation result and report link.
   </template-output>
+  <action>Inform user: "Note: sprint-status.yaml may now be out of sync. Run /gaia-sprint-status to reconcile."</action>
   <invoke-protocol name="review-gate-check" file="{project-root}/_gaia/core/protocols/review-gate-check.xml" />
 </step>
 </workflow>

@@ -4,6 +4,7 @@
   <mandate>Output must include machine-readable APPROVE or REQUEST_CHANGES</mandate>
 </critical>
 <step n="1" title="Load Story">
+  <action>Resolve story file: search for {story_key}-*.md in {implementation_artifacts}/ using glob pattern to match the full filename ({story_key}-{title_slug}.md)</action>
   <action>Read story file, identify files changed</action>
 </step>
 <step n="2" title="Status Gate">
@@ -38,10 +39,11 @@
 <step n="7" title="Update Review Gate and Transition">
   <action>Read story file, locate Review Gate table</action>
   <action>If APPROVE: update Code Review row status to PASSED, link report file</action>
-  <action>If REQUEST_CHANGES: update Code Review row status to FAILED, link report file. Do NOT change story status — the review-gate-check protocol or run-all-reviews orchestrator handles status transitions.</action>
+  <action>If REQUEST_CHANGES: update Code Review row status to REQUEST_CHANGES, link report file. Do NOT change story status — the review-gate-check protocol or run-all-reviews orchestrator handles status transitions.</action>
   <template-output file="{implementation_artifacts}/{story_key}-*.md">
     Update story file Review Gate table with code review result and report link.
   </template-output>
+  <action>Inform user: "Note: sprint-status.yaml may now be out of sync. Run /gaia-sprint-status to reconcile."</action>
   <invoke-protocol name="review-gate-check" file="{project-root}/_gaia/core/protocols/review-gate-check.xml" />
 </step>
 </workflow>

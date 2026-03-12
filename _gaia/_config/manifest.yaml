@@ -7,7 +7,7 @@ modules:
     path: "_gaia/core"
     type: built-in
   - name: lifecycle
-    version: "1.21.39"
+    version: "1.21.40"
     path: "_gaia/lifecycle"
     type: built-in
   - name: dev
@@ -19,6 +19,6 @@ modules:
     path: "_gaia/creative"
     type: built-in
   - name: testing
-    version: "1.5.8"
+    version: "1.5.9"
     path: "_gaia/testing"
     type: built-in

@@ -8,4 +8,4 @@ installed_path: "{project-root}/_gaia/testing/workflows/test-automation"
 instructions: "{installed_path}/instructions.xml"
 validation: "{installed_path}/checklist.md"
 output:
-  primary: "{test_artifacts}/automation-report.md"
+  primary: "{test_artifacts}/{story_key}-test-automation.md"

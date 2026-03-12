@@ -1,6 +1,6 @@
 {
   "name": "gaia-framework",
-  "version": "1.27.49",
+  "version": "1.27.50",
   "description": "GAIA — Generative Agile Intelligence Architecture installer",
   "bin": {
     "gaia-framework": "./bin/gaia-framework.js"
