@@ -24,10 +24,11 @@
   <action>Synthesize findings into 3-5 opportunity areas</action>
   <action>For each opportunity: describe it, estimate impact, note evidence</action>
   <action>Rank opportunities by potential impact and feasibility</action>
+  <action>Collect all ideas explored during the session that did not make the top opportunity list into a "Parking Lot" — for each, note the idea, why it was deprioritized, and under what conditions it might become viable</action>
 </step>
 <step n="5" title="Generate Output">
   <template-output file="{planning_artifacts}/project-brainstorm.md">
-    Generate structured brainstorm output with: vision summary, target users, pain points, competitive landscape, opportunity areas (ranked), and next steps per lifecycle-sequence.yaml.
+    Generate structured brainstorm output with: vision summary, target users, pain points, competitive landscape, opportunity areas (ranked), Parking Lot (deprioritized ideas with reasoning and revival conditions), and next steps per lifecycle-sequence.yaml.
   </template-output>
 </step>
 <next-step source="lifecycle-sequence.yaml">
