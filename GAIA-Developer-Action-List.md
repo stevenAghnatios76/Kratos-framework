@@ -29,10 +29,10 @@
 | G. Brownfield Cluster | 8 | 0 | 8 |
 | H. Run-All-Reviews Cluster | 5 | 0 | 5 |
 | I. Artifact Wiring Gaps (Issue Report) | 18 | 0 | 18 |
-| J. Individual High-Severity Bugs | 8 | 0 | 8 |
+| J. Individual High-Severity Bugs | 8 | 1 | 7 |
 | K. Individual Medium-Severity Bugs | 28 | 0 | 28 |
 | L. Individual Low-Severity Bugs | 18 | 0 | 18 |
-| **TOTAL** | **122** | **35** | **87** |
+| **TOTAL** | **122** | **36** | **86** |
 
 > BUG-073 is already closed — not counted above.
 
@@ -334,10 +334,8 @@
 
 These are not part of a systemic cluster but are individually high-impact.
 
-- [ ] **BUG-004** (High) — `/gaia-product-brief` doesn't load all Phase 1 research outputs
-  - File: `create-product-brief/instructions.xml`
-  - Fix: Load brainstorm + market-research + domain-research + tech-research (partially addressed by Issue 2)
-  - **Comment:** Overlaps with Issue 2 in Group I. If you fix 2a/2b, verify this also resolves.
+- [x] **BUG-004** (High) — `/gaia-product-brief` doesn't load all Phase 1 research outputs
+  - Fix: Added domain_research and technical_research to workflow.yaml input_file_patterns (FULL_LOAD). Updated instructions.xml to load both in Step 1, reference domain landscape in Step 4, and technical research in Step 5.
 
 - [ ] **BUG-007** (High) — `/gaia-product-brief` missing quality gate for brainstorm existence
   - File: `create-product-brief/workflow.yaml`

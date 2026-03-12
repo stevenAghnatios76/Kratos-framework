@@ -7,6 +7,8 @@
   <action>Invoke discover-inputs protocol</action>
   <action>Load brainstorm output if available</action>
   <action>Load market research if available</action>
+  <action>Load domain research if available</action>
+  <action>Load technical research if available</action>
   <action>Load creative outputs if available</action>
   <action>Summarize what upstream context was found</action>
 </step>
@@ -21,11 +23,12 @@
 </step>
 <step n="4" title="Problem Statement">
   <action>Articulate the core problem being solved</action>
-  <action>Ground in user research and market findings</action>
+  <action>Ground in user research, market findings, and domain landscape</action>
 </step>
 <step n="5" title="Proposed Solution">
   <action>Define high-level solution approach</action>
   <action>Key features and differentiators</action>
+  <action>Reference technical research for technology selection rationale if available</action>
 </step>
 <step n="6" title="Success Metrics">
   <action>Define measurable KPIs and success criteria</action>
