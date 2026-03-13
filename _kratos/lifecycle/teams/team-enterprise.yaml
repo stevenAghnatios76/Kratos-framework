@@ -8,7 +8,6 @@ agents:
   - sm
   - dev-*
   - qa
-  - tech-writer
   - devops
   - security
 use_case: "Full lifecycle with security and deployment (Phase 3+)"

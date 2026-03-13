@@ -35,4 +35,4 @@ name,code,command,description,agent
 "post-deploy-verify","post-deploy","kratos-post-deploy","Post-deployment health validation","devops"
 "rollback-plan","rollback-plan","kratos-rollback-plan","Rollback trigger criteria and procedures","devops"
 "triage-findings","triage-findings","kratos-triage-findings","Triage development findings into backlog stories","sm"
-"performance-review","performance-review","kratos-performance-review","Analyze performance bottlenecks","performance"
+"performance-review","performance-review","kratos-performance-review","Analyze performance bottlenecks","qa"

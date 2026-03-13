@@ -2,19 +2,21 @@
 
 [![Framework](https://img.shields.io/badge/framework-v1.27.4-blue)]()
 [![License](https://img.shields.io/badge/license-AGPL--3.0-green)]()
-[![Agents](https://img.shields.io/badge/agents-25-purple)]()
+[![Agents](https://img.shields.io/badge/agents-15-purple)]()
 [![Workflows](https://img.shields.io/badge/workflows-64-orange)]()
 
-AI agent framework for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [GitHub Copilot](https://github.com/features/copilot) that orchestrates software product development through **25 specialized agents**, **64 workflows**, and **8 shared skills** — from initial research all the way to deployment.
+AI agent framework for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [GitHub Copilot](https://github.com/features/copilot) that orchestrates software product development through **15 specialized agents**, **64 workflows**, and **8 shared skills** — from initial research all the way to deployment.
 
 KRATOS is a fork of the original GAIA framework. Upstream attribution: https://github.com/jlouage/Gaia-framework
+
+> **KRATOS is the lightweight edition of GAIA.** It ships with 15 agents optimized for fast, low-token-cost development workflows. If you need the full 25-agent experience — including a dedicated Technical Writer (Iris), Data Engineer (Milo), Performance Specialist (Juno), and 6 individual Creative agents — use the [GAIA framework](https://github.com/jlouage/Gaia-framework), the parent project this was forked from.
 
 ### Why KRATOS?
 
 Using Claude Code or GitHub Copilot alone, you prompt an AI assistant. With KRATOS, you manage a **team of AI specialists** that follow a proven product lifecycle:
 
 - **Structured lifecycle** — 5 phases from analysis to deployment, with quality gates that enforce standards at every transition
-- **25 specialized agents** — each with a persona, domain expertise, and persistent memory that improves over time
+- **15 specialized agents** — each with a persona, domain expertise, and persistent memory that improves over time
 - **Built-in quality gates** — 17 enforced gates that HALT workflows when standards aren't met (not advisory — hard stops)
 - **6-gate review process** — every story passes code review, QA, security, test automation, test review, and performance review before completion
 - **Checkpoint/resume** — long-running workflows survive context loss with sha256-verified checkpoints
@@ -183,12 +185,9 @@ Every agent has a name, persona, and specialization. Activate any agent directly
 | UX Designer | Christy | User research, interaction design, UI patterns | `/kratos-agent-ux-designer` |
 | System Architect | Theo | Architecture design, technical decisions, readiness | `/kratos-agent-architect` |
 | Scrum Master | Nate | Sprint planning, story prep, agile ceremonies | `/kratos-agent-sm` |
-| QA Engineer | Vera | Test automation, API testing, E2E testing | `/kratos-agent-qa` |
-| Technical Writer | Iris | Documentation, diagrams, editorial reviews | `/kratos-agent-tech-writer` |
+| QA Engineer | Vera | Test automation, API testing, E2E testing, performance review | `/kratos-agent-qa` |
 | Security Expert | Zara | Threat modeling, OWASP reviews, compliance | `/kratos-agent-security` |
 | DevOps Engineer | Soren | Infrastructure, deployment, rollback planning | `/kratos-agent-devops` |
-| Data Engineer | Milo | Schema design, ETL guidance, data quality | `/kratos-agent-data-engineer` |
-| Performance Specialist | Juno | Load testing, profiling, Core Web Vitals | `/kratos-agent-performance` |
 
 ### Developer Agents
 
@@ -202,14 +201,14 @@ All developer agents extend a shared base with common delivery rules. KRATOS now
 
 ### Creative Agents
 
-| Agent | Name | Specialization | Command |
-|-------|------|---------------|---------|
-| Brainstorming Coach | Rex | Facilitated ideation, creative techniques | `/kratos-agent-brainstorming` |
-| Problem Solver | Nova | Systematic problem-solving, root cause analysis | `/kratos-agent-problem-solver` |
-| Design Thinking Coach | Lyra | Human-centered design, empathy mapping | `/kratos-agent-design-thinking` |
-| Innovation Strategist | Orion | Business model innovation, disruption strategy | `/kratos-agent-innovation` |
-| Storyteller | Elara | Narrative crafting, story frameworks | `/kratos-agent-storyteller` |
-| Presentation Designer | Vermeer | Slide decks, visual communication | `/kratos-agent-presentation` |
+Six creative specializations are consolidated into two context-efficient composite agents. Each agent uses sectioned loading — only the relevant section is loaded per workflow invocation.
+
+| Agent | Names | Specialization | Command |
+|-------|-------|---------------|---------|
+| Creative Ideation | Rex / Nova / Lyra | Brainstorming, problem-solving, design thinking | `/kratos-agent-brainstorming`, `/kratos-problem-solving`, `/kratos-design-thinking` |
+| Creative Communications | Orion / Elara / Vermeer | Innovation strategy, storytelling, presentations | `/kratos-agent-innovation`, `/kratos-storytelling`, `/kratos-slide-deck` |
+
+> For dedicated single-persona creative agents (Rex, Nova, Lyra, Orion, Elara, Vermeer as separate files), see [GAIA](https://github.com/jlouage/Gaia-framework).
 
 ### Testing Agent
 
@@ -412,14 +411,14 @@ _kratos/
 ├── core/                 # Execution engine, protocols, shared tasks
 │   └── engine/           # workflow.xml (7-step flow), task-runner.xml
 ├── lifecycle/            # 5 phases: analysis → deployment
-│   ├── agents/           # 11 lifecycle agents
+│   ├── agents/           # 9 lifecycle agents
 │   ├── workflows/        # 36 workflows across 5 phases
 │   └── templates/        # 18 document templates
 ├── dev/                  # Developer tooling
-│   ├── agents/           # 6 stack-specific developers
+│   ├── agents/           # 3 senior developers + base
 │   ├── skills/           # 8 shared skills (sectioned loading)
 │   └── knowledge/        # Stack-specific patterns
-├── creative/             # 6 creative agents + 7 workflows
+├── creative/             # 2 composite creative agents + 7 workflows
 └── testing/              # Test Architect + 12 testing workflows
 ```
 
@@ -427,7 +426,7 @@ _kratos/
 
 | Component | Count |
 |-----------|-------|
-| Agents | 25 with distinct personas |
+| Agents | 15 with distinct personas (25 in [GAIA](https://github.com/jlouage/Gaia-framework)) |
 | Workflows | 64 across 5 lifecycle phases |
 | Standalone tasks | 15 (reviews, audits, utilities) |
 | Slash commands | 104 |

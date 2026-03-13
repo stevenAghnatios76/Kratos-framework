@@ -2,7 +2,6 @@ name: "Data-Intensive Team"
 description: "Data pipeline and analytics projects"
 agents:
   - architect
-  - data-engineer
   - dev-*
   - qa
 use_case: "Data pipeline and analytics projects"

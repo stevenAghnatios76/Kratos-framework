@@ -1,7 +1,7 @@
 name: slide-deck
 description: 'Create a presentation slide deck with narrative arc and visual design'
 module: creative
-agent: presentation-designer
+agent: creative-comms
 config_resolved: "{project-root}/_kratos/creative/.resolved/slide-deck.yaml"
 config_source: "{project-root}/_kratos/creative/config.yaml"
 installed_path: "{project-root}/_kratos/creative/workflows/slide-deck"

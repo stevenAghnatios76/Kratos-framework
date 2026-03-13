@@ -1,7 +1,7 @@
 name: storytelling
 description: 'Craft compelling narratives using story frameworks and emotional design'
 module: creative
-agent: storyteller
+agent: creative-comms
 config_resolved: "{project-root}/_kratos/creative/.resolved/storytelling.yaml"
 config_source: "{project-root}/_kratos/creative/config.yaml"
 installed_path: "{project-root}/_kratos/creative/workflows/storytelling"

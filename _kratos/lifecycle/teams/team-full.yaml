@@ -8,6 +8,5 @@ agents:
   - sm
   - dev-*
   - qa
-  - tech-writer
 use_case: "Complete product lifecycle"
 phases: [1-analysis, 2-planning, 3-solutioning, 4-implementation]

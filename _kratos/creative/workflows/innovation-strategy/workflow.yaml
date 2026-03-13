@@ -1,7 +1,7 @@
 name: innovation-strategy
 description: 'Identify disruption opportunities and architect business model innovation'
 module: creative
-agent: innovation-strategist
+agent: creative-comms
 config_resolved: "{project-root}/_kratos/creative/.resolved/innovation-strategy.yaml"
 config_source: "{project-root}/_kratos/creative/config.yaml"
 installed_path: "{project-root}/_kratos/creative/workflows/innovation-strategy"

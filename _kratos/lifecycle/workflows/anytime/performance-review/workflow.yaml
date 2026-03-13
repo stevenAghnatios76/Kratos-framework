@@ -1,7 +1,7 @@
 name: performance-review
 description: 'Analyze performance bottlenecks and recommend optimizations'
 module: lifecycle
-agent: performance
+agent: qa
 config_resolved: "{project-root}/_kratos/lifecycle/.resolved/performance-review.yaml"
 config_source: "{project-root}/_kratos/lifecycle/config.yaml"
 installed_path: "{project-root}/_kratos/lifecycle/workflows/anytime/performance-review"

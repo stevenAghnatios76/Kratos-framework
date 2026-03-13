@@ -1,7 +1,7 @@
 name: pitch-deck
 description: 'Create an investor/partner pitch deck with standard structure'
 module: creative
-agent: presentation-designer
+agent: creative-comms
 config_resolved: "{project-root}/_kratos/creative/.resolved/pitch-deck.yaml"
 config_source: "{project-root}/_kratos/creative/config.yaml"
 installed_path: "{project-root}/_kratos/creative/workflows/pitch-deck"
