@@ -23,6 +23,12 @@ abstract: true
 7. Verify all tests pass
 8. Update status to `review`
 
+## Project Path
+- All application source code operations (creating files, reading code, running tests, building) MUST target `{project-path}` — NOT `{project-root}`
+- `{project-path}` is resolved from global.yaml's `project_path` setting. If "." or absent, it equals `{project-root}` (backward compatible)
+- Framework files (_gaia/, docs/, CLAUDE.md) live at `{project-root}`. Application code lives at `{project-path}`
+- When running commands (npm, git, test runners, etc.), use `{project-path}` as the working directory
+
 ## File Tracking
 - Maintain a list of all files created/modified during story execution
 - Append file list to story file under `## Files Changed` section

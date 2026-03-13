@@ -6,7 +6,7 @@ set -euo pipefail
 # Installs, updates, validates, and reports on GAIA installations.
 # ─────────────────────────────────────────────────────────────────────────────
 
-readonly VERSION="1.27.53"
+readonly VERSION="1.27.54"
 readonly GITHUB_REPO="https://github.com/jlouage/Gaia-framework.git"
 readonly MANIFEST_REL="_gaia/_config/manifest.yaml"
 
@@ -274,24 +274,66 @@ cmd_init() {
 
   # Step 5: Customize global.yaml
   step "Configuring global.yaml..."
-  local project_name user_name
+  local project_name user_name project_path_value
   local dir_name
   dir_name="$(basename "$TARGET")"
   project_name="$(prompt_value "Project name" "$dir_name")"
   user_name="$(prompt_value "User name" "$(whoami)")"
 
+  # Auto-detect project directory: look for known project markers in subdirectories
+  local detected_path="."
+  for candidate in "$TARGET"/*/; do
+    [[ -d "$candidate" ]] || continue
+    local cname
+    cname="$(basename "$candidate")"
+    # Skip framework and docs directories
+    [[ "$cname" == "_gaia" || "$cname" == "docs" || "$cname" == ".claude" || "$cname" == ".git" || "$cname" == "node_modules" ]] && continue
+    # Check for known project markers
+    if [[ -f "$candidate/package.json" || -f "$candidate/pom.xml" || -f "$candidate/build.gradle" || \
+          -f "$candidate/Cargo.toml" || -f "$candidate/go.mod" || -f "$candidate/pyproject.toml" || \
+          -f "$candidate/pubspec.yaml" || -f "$candidate/requirements.txt" || -f "$candidate/Makefile" || \
+          -f "$candidate/CMakeLists.txt" || -f "$candidate/setup.py" ]]; then
+      detected_path="$cname"
+      info "Detected project directory: $cname/"
+      break
+    fi
+  done
+
+  # Also check if root itself has project markers (meaning project is at root)
+  if [[ "$detected_path" == "." ]]; then
+    if [[ -f "$TARGET/package.json" || -f "$TARGET/pom.xml" || -f "$TARGET/build.gradle" || \
+          -f "$TARGET/Cargo.toml" || -f "$TARGET/go.mod" || -f "$TARGET/pyproject.toml" || \
+          -f "$TARGET/pubspec.yaml" ]]; then
+      info "Project code detected at root directory"
+    fi
+  fi
+
+  project_path_value="$(prompt_value "Project path (relative dir for source code, '.' for root)" "$detected_path")"
+
+  # Create project directory if it doesn't exist and is not "."
+  if [[ "$project_path_value" != "." && ! -d "$TARGET/$project_path_value" ]]; then
+    if [[ "$OPT_DRY_RUN" == true ]]; then
+      detail "[dry-run] Would create project directory: $project_path_value/"
+    else
+      mkdir -p "$TARGET/$project_path_value"
+      detail "Created project directory: $project_path_value/"
+    fi
+  fi
+
   if [[ "$OPT_DRY_RUN" == true ]]; then
-    detail "[dry-run] Would set project_name=$project_name, user_name=$user_name"
+    detail "[dry-run] Would set project_name=$project_name, user_name=$user_name, project_path=$project_path_value"
   else
     local global_file="$TARGET/_gaia/_config/global.yaml"
     if [[ -f "$global_file" ]]; then
       # Use portable sed for both macOS and Linux
       if [[ "$(uname)" == "Darwin" ]]; then
-        sed -i '' "s/^project_name:.*/project_name: \"$project_name\"/" "$global_file"
-        sed -i '' "s/^user_name:.*/user_name: \"$user_name\"/" "$global_file"
+        sed -i '' "s|^project_name:.*|project_name: \"$project_name\"|" "$global_file"
+        sed -i '' "s|^user_name:.*|user_name: \"$user_name\"|" "$global_file"
+        sed -i '' "s|^project_path:.*|project_path: \"$project_path_value\"|" "$global_file"
       else
-        sed -i "s/^project_name:.*/project_name: \"$project_name\"/" "$global_file"
-        sed -i "s/^user_name:.*/user_name: \"$user_name\"/" "$global_file"
+        sed -i "s|^project_name:.*|project_name: \"$project_name\"|" "$global_file"
+        sed -i "s|^user_name:.*|user_name: \"$user_name\"|" "$global_file"
+        sed -i "s|^project_path:.*|project_path: \"$project_path_value\"|" "$global_file"
       fi
     fi
   fi

@@ -1,4 +1,4 @@
-# GAIA Framework v1.27.53
+# GAIA Framework v1.27.54
 
 This project uses the **GAIA** (Generative Agile Intelligence Architecture) framework — an AI agent framework for Claude Code that orchestrates software product development through 25 specialized agents, 62 workflows, and 8 shared skills.
 
@@ -42,12 +42,29 @@ _gaia/                    # Framework root
 - `docs/test-artifacts/` — Test plans, traceability
 - `docs/creative-artifacts/` — Design thinking, innovation outputs
 
+## Project Path
+
+GAIA supports separating the framework from the application source code. The `project_path` setting in `global.yaml` controls where application code lives:
+
+- `project_path: "."` (default) — project code lives at the root alongside `_gaia/`. This is backward compatible.
+- `project_path: "my-app"` — project code lives in a subdirectory. GAIA framework stays at root, code goes in `my-app/`.
+
+**Resolved variables:**
+- `{project-root}` — always the root directory where `_gaia/` lives. Used for framework paths, docs, and artifacts.
+- `{project-path}` — where application source code lives. Equals `{project-root}` if project_path is `"."`, otherwise `{project-root}/{project_path}`.
+
+**Rules:**
+- Dev agents MUST write application code to `{project-path}`, not `{project-root}`
+- Brownfield onboarding scans `{project-path}` for codebase discovery
+- Framework artifacts (docs/, _gaia/) always stay at `{project-root}`
+- Commands like `npm install`, `git`, test runners use `{project-path}` as working directory
+
 ## Global Rules (apply to ALL agents and workflows)
 
 ### Config Resolution
 1. Check for pre-resolved config in `_gaia/{module}/.resolved/{workflow}.yaml`
 2. If not found: load `workflow.yaml` → module `config.yaml` (which inherits `global.yaml`)
-3. Resolve `{project-root}`, `{installed_path}`, system-generated values
+3. Resolve `{project-root}`, `{project-path}`, `{installed_path}`, system-generated values
 4. After any config change, run `/gaia-build-configs` to regenerate resolved configs
 
 ### Context Budget

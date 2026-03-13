@@ -6,6 +6,7 @@
   <mandate>Write an intermediate checkpoint to _gaia/_memory/checkpoints/dev-story-{story_key}.yaml after EACH TDD phase completes (Steps 6, 7, 8). Each checkpoint must include: workflow name, current step number, phase status (red_complete/green_complete/refactor_complete), key variables (story_key, epic_key, risk_level), output file path, and files_touched with sha256 checksums (shasum -a 256) for every file created or modified in that phase.</mandate>
   <mandate>Definition of Done checklist MUST be written to the story file and every item verified before marking complete. The DoD gate (Step 10) is enforced — workflow HALTS if any item fails.</mandate>
   <mandate>All tests must pass before marking complete</mandate>
+  <mandate>When reading or running application source code, use {project-path} as the base directory — NOT {project-root}. {project-path} is resolved by the engine from global.yaml.</mandate>
 </critical>
 <step n="1" title="Load Story File">
   <action>Read story .md file, parse YAML frontmatter</action>

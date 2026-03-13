@@ -2,6 +2,7 @@
 <critical>
   <mandate>Story must be in review status before code review</mandate>
   <mandate>Output must include machine-readable APPROVE or REQUEST_CHANGES</mandate>
+  <mandate>When reading or running application source code, use {project-path} as the base directory — NOT {project-root}. {project-path} is resolved by the engine from global.yaml.</mandate>
 </critical>
 <step n="1" title="Load Story">
   <action>Resolve story file: search for {story_key}-*.md in {implementation_artifacts}/ using glob pattern to match the full filename ({story_key}-{title_slug}.md)</action>

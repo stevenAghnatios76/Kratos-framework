@@ -22,7 +22,7 @@ execution modes (normal/yolo/planning), checkpoints, and quality gates.
   <rule n="1">LOAD the workflow.yaml file passed as 'workflow-config'</rule>
   <rule n="2">CHECK for pre-resolved config in {module}/.resolved/{workflow-name}.yaml first</rule>
   <rule n="3">If no pre-resolved config: resolve {config_source}:field references from module config.yaml</rule>
-  <rule n="4">RESOLVE all {project-root}, {installed_path}, {date} variables</rule>
+  <rule n="4">RESOLVE all {project-root}, {project-path}, {installed_path}, {date} variables. {project-path} resolves to {project-root}/{project_path} from global.yaml (or just {project-root} if project_path is ".")</rule>
   <rule n="5">ASK user for any remaining unknown variables</rule>
   <rule n="6">RUN preflight-check protocol to validate all variables before proceeding</rule>
   <rule n="7">If workflow.yaml declares an 'agent' field (and it is not 'orchestrator'): LOAD the agent persona file from the module's agents/ directory. Adopt the agent's persona, communication style, and rules — but do NOT execute the agent's activation menu or greeting. The engine remains in control of step execution.</rule>
@@ -44,6 +44,7 @@ execution modes (normal/yolo/planning), checkpoints, and quality gates.
     <action if="pre-resolved exists">Load pre-resolved config (skip inheritance chain)</action>
     <action if="no pre-resolved">Load config_source file, resolve field references</action>
     <action>Resolve {project-root} to actual filesystem project root path</action>
+    <action>Resolve {project-path}: read project_path from global.yaml. If "." or missing, {project-path} = {project-root}. Otherwise, {project-path} = {project-root}/{project_path}. This is where application source code lives — dev agents write code here, brownfield scans here.</action>
     <action>Resolve {installed_path} from workflow.yaml location</action>
     <action>Resolve {date} to current date</action>
     <action>Ask user for any remaining unresolved variables</action>

@@ -3,6 +3,7 @@
   <mandate>Story must be in review status before QA testing</mandate>
   <mandate>Do NOT write executable test files to the source tree (tests/, spec/, __tests__/, e2e/). Document test cases in the QA report only, written to {test_artifacts}/.</mandate>
   <mandate>Output must include machine-readable PASSED or FAILED verdict</mandate>
+  <mandate>When reading or running application source code, use {project-path} as the base directory — NOT {project-root}. {project-path} is resolved by the engine from global.yaml.</mandate>
 </critical>
 <step n="1" title="Load Story and Code">
   <action>Resolve story file: search for {story_key}-*.md in {implementation_artifacts}/ using glob pattern to match the full filename ({story_key}-{title_slug}.md)</action>
