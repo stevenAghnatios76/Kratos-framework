@@ -154,6 +154,24 @@ npx kratos-framework validate .   # 32 integrity checks
 npx kratos-framework status .     # version, module list, command count
 ```
 
+### Dashboard
+
+Run the local dashboard from the repository root:
+
+```bash
+npm run dashboard
+```
+
+Or run it directly from the dashboard folder:
+
+```bash
+cd dashboard
+npm install
+npm start
+```
+
+The dashboard is available at `http://localhost:3456` and reads Claude session data from `~/.claude/` for the current repository.
+
 ---
 
 ## How It Works
