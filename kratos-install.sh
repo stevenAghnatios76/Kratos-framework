@@ -7,8 +7,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 readonly VERSION="1.27.4"
-readonly DEFAULT_GITHUB_REPO="https://github.com/jlouage/Kratos-framework.git"
-readonly GITHUB_REPO="${KRATOS_REPO_URL:-$DEFAULT_GITHUB_REPO}"
+readonly DEFAULT_GITHUB_REPO="https://github.com/stevenAghnatios76/Kratos-framework.git"
 readonly MANIFEST_REL="_kratos/_config/manifest.yaml"
 
 # Temp dir tracking for cleanup
@@ -31,6 +30,16 @@ error()   { printf "${RED}✖${RESET}  %s\n" "$*" >&2; }
 step()    { printf "${CYAN}→${RESET}  %s\n" "$*"; }
 detail()  { printf "${DIM}   %s${RESET}\n" "$*"; }
 
+normalize_repo_url() {
+  local repo_url="$1"
+  if [[ "$repo_url" == git+* ]]; then
+    printf '%s\n' "${repo_url#git+}"
+    return 0
+  fi
+
+  printf '%s\n' "$repo_url"
+}
+
 # ─── Globals (set by argument parsing) ──────────────────────────────────────
 
 CMD=""
@@ -40,6 +49,7 @@ OPT_YES=false
 OPT_MINIMAL=false
 OPT_DRY_RUN=false
 OPT_VERBOSE=false
+GITHUB_REPO="$(normalize_repo_url "${KRATOS_REPO_URL:-$DEFAULT_GITHUB_REPO}")"
 
 # ─── Utility Functions ──────────────────────────────────────────────────────
 

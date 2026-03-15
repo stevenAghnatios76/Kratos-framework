@@ -12,8 +12,7 @@ const { tmpdir } = require("os");
 
 const pkg = require("../package.json");
 
-const DEFAULT_REPO_URL = pkg.repository?.url || "https://github.com/jlouage/Kratos-framework.git";
-const REPO_URL = process.env.KRATOS_REPO_URL || DEFAULT_REPO_URL;
+const DEFAULT_REPO_URL = pkg.repository?.url || "https://github.com/stevenAghnatios76/Kratos-framework.git";
 const SCRIPT_NAME = "kratos-install.sh";
 const IS_WINDOWS = process.platform === "win32";
 
@@ -51,6 +50,16 @@ function fail(message) {
 
 function info(message) {
   console.log(`\x1b[34mℹ\x1b[0m  ${message}`);
+}
+
+function normalizeRepoUrl(repoUrl) {
+  if (!repoUrl) return repoUrl;
+
+  if (repoUrl.startsWith("git+")) {
+    return repoUrl.slice(4);
+  }
+
+  return repoUrl;
 }
 
 function cleanup() {
@@ -132,6 +141,8 @@ function main() {
   // Ensure git is available
   ensureGit();
 
+  const repoUrl = normalizeRepoUrl(process.env.KRATOS_REPO_URL || DEFAULT_REPO_URL);
+
   // Clone the repo to a temp directory
   tempDir = mkdtempSync(join(tmpdir(), "kratos-framework-"));
 
@@ -143,12 +154,12 @@ function main() {
   info("Cloning KRATOS framework from GitHub...");
 
   try {
-    execSync(`git clone --depth 1 ${REPO_URL} "${tempDir}"`, {
+    execFileSync("git", ["clone", "--depth", "1", repoUrl, tempDir], {
       stdio: ["ignore", "ignore", "pipe"],
     });
   } catch (err) {
     fail(
-      `Failed to clone from ${REPO_URL}\n` +
+      `Failed to clone from ${repoUrl}\n` +
         `   ${err.stderr ? err.stderr.toString().trim() : "Check your network connection."}`
     );
   }
