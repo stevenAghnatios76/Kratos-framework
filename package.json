@@ -3,7 +3,8 @@
   "version": "1.27.57",
   "description": "KRATOS — Generative Agile Intelligence Architecture installer for Claude Code and GitHub Copilot",
   "bin": {
-    "kratos-framework": "bin/kratos-framework.js"
+    "kratos-framework": "bin/kratos-framework.js",
+    "kratos": "./dist/_kratos/core/runtime/cli.js"
   },
   "keywords": [
     "kratos",
@@ -21,6 +22,9 @@
   },
   "license": "AGPL-3.0",
   "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "kratos": "node dist/_kratos/core/runtime/cli.js",
     "dashboard": "cd dashboard && npm install && npm start"
   },
   "engines": {
@@ -30,5 +34,16 @@
     "bin/",
     "dashboard/",
     "kratos-install.sh"
-  ]
+  ],
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "ora": "^9.3.0",
+    "sql.js": "^1.14.1",
+    "yaml": "^2.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^6.0.2"
+  }
 }

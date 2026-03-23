@@ -33,3 +33,34 @@ installed_path: "{project-root}/_kratos"
 config_path: "{project-root}/_kratos/_config"
 memory_path: "{project-root}/_kratos/_memory"
 checkpoint_path: "{project-root}/_kratos/_memory/checkpoints"
+
+# Intelligence system (Phase 1)
+intelligence:
+  memory:
+    backend: "sqlite"
+    db_path: "{memory_path}/memory.db"
+    partitions: [decisions, patterns, facts, context, anti-patterns, trajectories]
+    ttl_days: 90
+    max_entries_per_partition: 5000
+    eviction: "lru"
+  learning:
+    enabled: true
+    trajectory_recording: true
+    pattern_distillation: true
+    min_trajectories_before_distill: 3
+    min_score_for_pattern: 0.7
+    max_score_for_anti_pattern: 0.3
+    forgetting_protection: true
+    protection_min_score: 0.85
+    protection_min_uses: 5
+    feedback_source: "review-gates"
+  collective:
+    enabled: true
+    shared_partitions: [facts, patterns, decisions, anti-patterns]
+    subscription_mode: "automatic"
+    auto_setup_defaults: true
+    notification_retention_days: 30
+    consensus:
+      auto_resolve: true
+      authority_matrix_enabled: true
+      escalate_to_human: true
