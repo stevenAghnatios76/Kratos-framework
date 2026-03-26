@@ -12,5 +12,8 @@ docs/phases/
 node_modules/
 dashboard/node_modules/
 
+# Build output
+dist/
+
 # OS
 .DS_Store
