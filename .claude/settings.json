@@ -1,0 +1,16 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "node \"$CLAUDE_PROJECT_DIR/.claude/helpers/statusline.cjs\""
+  },
+  "permissions": {
+    "allow": [
+      "Bash(node .claude/*)",
+      "Bash(node .claude/helpers/*)",
+      "Bash(git status)",
+      "Bash(git branch*)",
+      "Bash(git log*)",
+      "Bash(git diff*)"
+    ]
+  }
+}

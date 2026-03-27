@@ -1,9 +1,35 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
+import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as readline from 'readline';
+import { spawn } from 'child_process';
+import * as ui from './ui.js';
+import { showSplash } from './splash.js';
+import { startSession, listAgents, findAgent, getAgentDetails } from './agent-runner.js';
 
 const program = new Command();
+
+// ── Credentials ───────────────────────────────────────────────────────────────
+const CREDENTIALS_PATH = path.join(os.homedir(), '.kratos', 'credentials.json');
+
+/** Read ~/.kratos/credentials.json and inject keys into process.env (non-destructive). */
+function loadCredentials(): void {
+  try {
+    if (!fs.existsSync(CREDENTIALS_PATH)) return;
+    const creds = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf-8')) as Record<string, string>;
+    for (const [key, value] of Object.entries(creds)) {
+      if (typeof value === 'string' && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  } catch {
+    // Silently ignore — bad JSON or unreadable file
+  }
+}
+
+loadCredentials();
 
 // Resolve project root (walk up until we find _kratos/)
 function findProjectRoot(): string {
@@ -23,7 +49,18 @@ const CHECKPOINT_DIR = path.join(KRATOS_ROOT, '_memory', 'checkpoints');
 program
   .name('kratos')
   .description('Kratos Framework CLI — AI-powered product development')
-  .version('2.2.0');
+  .version('2.2.0')
+  .option('--splash', 'Show splash screen')
+  .action(async () => {
+    // Called only in single-command mode with no subcommand — show help
+    program.outputHelp();
+  });
+
+program.on('option:splash', async () => {
+  await ui.init();
+  await showSplash();
+  process.exit(0);
+});
 
 // ============================================================
 // MEMORY COMMANDS
@@ -38,6 +75,7 @@ memory
   .option('-l, --limit <n>', 'Max results', '10')
   .action(async (query: string, opts: { agent?: string; partition?: string; limit: string }) => {
     const { MemoryManager } = await import('../../intelligence/memory/memory-manager.js');
+    const s = ui.spinner('Searching memory...');
     const mm = new MemoryManager(MEMORY_DB_PATH);
     await mm.init();
 
@@ -46,13 +84,15 @@ memory
       partition: opts.partition,
       limit: parseInt(opts.limit),
     });
+    s.stop();
 
     if (results.length === 0) {
-      console.log('No results found.');
+      ui.info('No results found.');
     } else {
+      ui.heading('Search Results');
       for (const entry of results) {
-        console.log(`[${entry.partition}] ${entry.title} (score: ${entry.score}, agent: ${entry.agent_id})`);
-        console.log(`  ${entry.content.split('\n')[0].substring(0, 120)}`);
+        ui.resultRow(entry.title, entry.content.split('\n')[0].substring(0, 120), entry.score);
+        ui.info(`${entry.partition} · ${entry.agent_id}`);
         console.log('');
       }
     }
@@ -65,21 +105,25 @@ memory
   .description('Show memory statistics')
   .action(async () => {
     const { MemoryManager } = await import('../../intelligence/memory/memory-manager.js');
+    const s = ui.spinner('Loading memory stats...');
     const mm = new MemoryManager(MEMORY_DB_PATH);
     await mm.init();
     const stats = await mm.getStats();
+    s.stop();
 
-    console.log('Memory Statistics:');
-    console.log(`  Total entries: ${stats.total_entries}`);
-    console.log(`  Stale: ${stats.stale_count}`);
-    console.log(`  Expired: ${stats.expired_count}`);
-    console.log('\nBy partition:');
+    ui.heading('Memory Statistics');
+    ui.keyValue('Total entries', stats.total_entries);
+    ui.keyValue('Stale', stats.stale_count);
+    ui.keyValue('Expired', stats.expired_count);
+
+    ui.subheading('By partition');
     for (const [p, count] of Object.entries(stats.by_partition)) {
-      console.log(`  ${p}: ${count}`);
+      ui.keyValue(p, count as number);
     }
-    console.log('\nBy agent:');
+
+    ui.subheading('By agent');
     for (const [a, count] of Object.entries(stats.by_agent)) {
-      console.log(`  ${a}: ${count}`);
+      ui.keyValue(a, count as number);
     }
 
     await mm.close();
@@ -97,10 +141,10 @@ memory
 
     if (opts.agent) {
       const md = await mm.exportAgentSidecar(opts.agent);
-      console.log(md);
+      ui.raw(md);
     } else {
       await mm.exportAllSidecars(opts.output);
-      console.log(`Sidecars exported to ${opts.output}`);
+      ui.success(`Sidecars exported to ${opts.output}`);
     }
 
     await mm.close();
@@ -112,19 +156,21 @@ memory
   .action(async () => {
     const { MemoryManager } = await import('../../intelligence/memory/memory-manager.js');
     const { SidecarMigration } = await import('../../intelligence/memory/migration.js');
+    const s = ui.spinner('Migrating sidecars...');
     const mm = new MemoryManager(MEMORY_DB_PATH);
     await mm.init();
 
     const migration = new SidecarMigration(mm, path.join(KRATOS_ROOT, '_memory'));
     const result = await migration.migrate();
+    s.stop();
 
-    console.log(`Migration complete:`);
-    console.log(`  Agents migrated: ${result.agents_migrated}`);
-    console.log(`  Entries imported: ${result.entries_imported}`);
+    ui.heading('Migration Complete');
+    ui.keyValue('Agents migrated', result.agents_migrated);
+    ui.keyValue('Entries imported', result.entries_imported);
     if (result.errors.length > 0) {
-      console.log(`  Errors: ${result.errors.length}`);
+      ui.subheading('Errors');
       for (const err of result.errors) {
-        console.error(`    ${err}`);
+        ui.error(err);
       }
     }
 
@@ -136,10 +182,12 @@ memory
   .description('Remove expired entries')
   .action(async () => {
     const { MemoryManager } = await import('../../intelligence/memory/memory-manager.js');
+    const s = ui.spinner('Expiring stale entries...');
     const mm = new MemoryManager(MEMORY_DB_PATH);
     await mm.init();
     const count = await mm.expireStaleEntries();
-    console.log(`Expired ${count} entries.`);
+    s.stop();
+    ui.success(`Expired ${count} entries.`);
     await mm.close();
   });
 
@@ -155,16 +203,18 @@ learn
   .action(async (opts: { agent?: string }) => {
     const { MemoryManager } = await import('../../intelligence/memory/memory-manager.js');
     const { PatternDistiller } = await import('../../intelligence/learning/pattern-distiller.js');
+    const s = ui.spinner('Distilling patterns...');
     const mm = new MemoryManager(MEMORY_DB_PATH);
     await mm.init();
 
     const distiller = new PatternDistiller(mm);
     const result = await distiller.runDistillationCycle();
+    s.stop();
 
-    console.log('Distillation complete:');
-    console.log(`  Patterns created: ${result.patterns_created}`);
-    console.log(`  Anti-patterns created: ${result.anti_patterns_created}`);
-    console.log(`  Trajectories analyzed: ${result.trajectories_analyzed}`);
+    ui.heading('Distillation Complete');
+    ui.keyValue('Patterns created', result.patterns_created);
+    ui.keyValue('Anti-patterns created', result.anti_patterns_created);
+    ui.keyValue('Trajectories analyzed', result.trajectories_analyzed);
 
     await mm.close();
   });
@@ -188,11 +238,12 @@ learn
     });
 
     if (entries.length === 0) {
-      console.log(`No ${partition} found.`);
+      ui.info(`No ${partition} found.`);
     } else {
+      ui.heading(opts.anti ? 'Anti-Patterns' : 'Patterns');
       for (const entry of entries) {
-        console.log(`[${entry.score.toFixed(2)}] ${entry.title} (agent: ${entry.agent_id})`);
-        console.log(`  ${entry.content.split('\n')[0].substring(0, 120)}`);
+        ui.resultRow(entry.title, entry.content.split('\n')[0].substring(0, 120), entry.score);
+        ui.info(`agent: ${entry.agent_id}`);
         console.log('');
       }
     }
@@ -206,16 +257,18 @@ learn
   .action(async () => {
     const { MemoryManager } = await import('../../intelligence/memory/memory-manager.js');
     const { ForgettingShield } = await import('../../intelligence/learning/forgetting-shield.js');
+    const s = ui.spinner('Running protection cycle...');
     const mm = new MemoryManager(MEMORY_DB_PATH);
     await mm.init();
 
     const shield = new ForgettingShield(mm);
     const result = await shield.runProtectionCycle();
+    s.stop();
 
-    console.log('Protection cycle complete:');
-    console.log(`  Newly protected: ${result.newly_protected}`);
-    console.log(`  Unprotected: ${result.unprotected}`);
-    console.log(`  Total protected: ${result.total_protected}`);
+    ui.heading('Protection Cycle Complete');
+    ui.keyValue('Newly protected', result.newly_protected);
+    ui.keyValue('Unprotected', result.unprotected);
+    ui.keyValue('Total protected', result.total_protected);
 
     await mm.close();
   });
@@ -234,13 +287,13 @@ sprint
     const statusPath = opts.status || path.join(PROJECT_ROOT, 'docs', 'implementation-artifacts', 'sprint-status.yaml');
 
     if (!fs.existsSync(statusPath)) {
-      console.error(`Sprint status file not found: ${statusPath}`);
+      ui.error(`Sprint status file not found: ${statusPath}`);
       process.exit(1);
     }
 
     const graph = new DependencyGraph();
     await graph.buildFromSprint(statusPath);
-    console.log(graph.toText());
+    ui.raw(graph.toText());
   });
 
 sprint
@@ -257,13 +310,17 @@ sprint
       execution_mode: 'normal',
     });
 
-    console.log(`Running all 6 reviews for ${storyKey}...`);
+    const s = ui.spinner(`Running all 6 reviews for ${storyKey}...`);
     const result = await executor.executeReviewsParallel(storyKey);
+    s.stop();
 
+    ui.heading(`Review Results — ${storyKey}`);
     for (const [review, status] of Object.entries(result.results)) {
-      console.log(`  ${status === 'PASSED' ? 'PASS' : 'FAIL'} ${review}`);
+      ui.statusRow(status === 'PASSED', review);
     }
-    console.log(`\nAll passed: ${result.all_passed} (${result.duration_sec.toFixed(1)}s)`);
+    ui.divider();
+    ui.keyValue('All passed', result.all_passed ? 'Yes' : 'No');
+    ui.keyValue('Duration', `${result.duration_sec.toFixed(1)}s`);
   });
 
 // ============================================================
@@ -281,13 +338,12 @@ providers
     await registry.init(configPath);
 
     const list = registry.listProviders();
-    console.log('LLM Providers:\n');
+    ui.heading('LLM Providers');
     for (const p of list) {
-      const status = p.available ? 'AVAILABLE' : 'DISABLED';
-      console.log(`  [${status}] ${p.name} (${p.tier})`);
-      console.log(`    fast:           ${p.models.fast}`);
-      console.log(`    standard:       ${p.models.standard}`);
-      console.log(`    deep_reasoning: ${p.models.deep_reasoning}`);
+      ui.statusRow(p.available, `${p.name} (${p.tier})`);
+      ui.keyValue('fast', p.models.fast, 6);
+      ui.keyValue('standard', p.models.standard, 6);
+      ui.keyValue('deep_reasoning', p.models.deep_reasoning, 6);
       console.log('');
     }
   });
@@ -303,19 +359,23 @@ providers
 
     const provider = registry.getProvider(name);
     if (!provider) {
-      console.error(`Unknown provider: ${name}`);
+      ui.error(`Unknown provider: ${name}`);
       process.exit(1);
     }
     if (!provider.available) {
-      console.error(`Provider ${name} is not available (SDK missing or not configured)`);
+      ui.error(`Provider ${name} is not available (SDK missing or not configured)`);
       process.exit(1);
     }
 
-    console.log(`Testing ${name}...`);
+    const s = ui.spinner(`Testing ${name}...`);
     const result = await provider.test();
-    console.log(`  OK: ${result.ok}`);
-    console.log(`  Latency: ${result.latency_ms}ms`);
-    if (result.error) console.log(`  Error: ${result.error}`);
+    if (result.ok) {
+      s.succeed(`${name} — OK`);
+    } else {
+      s.fail(`${name} — Failed`);
+    }
+    ui.keyValue('Latency', `${result.latency_ms}ms`);
+    if (result.error) ui.error(result.error);
   });
 
 providers
@@ -332,14 +392,95 @@ providers
     const inputTokens = Math.round(totalTokens * 0.7);
     const outputTokens = Math.round(totalTokens * 0.3);
 
-    console.log(`Sprint Cost Estimate (${totalTokens.toLocaleString()} tokens):\n`);
+    ui.heading(`Sprint Cost Estimate (${totalTokens.toLocaleString()} tokens)`);
     for (const tier of ['fast', 'standard', 'deep_reasoning'] as const) {
       const estimates = registry.estimateCost(inputTokens, outputTokens, tier);
-      console.log(`  ${tier}:`);
+      ui.subheading(tier);
       for (const [provider, amount] of Object.entries(estimates)) {
-        console.log(`    ${provider}: $${(amount as number).toFixed(4)}`);
+        ui.keyValue(provider, `$${(amount as number).toFixed(4)}`);
       }
     }
+  });
+
+// Mapping of provider name → env var name
+const PROVIDER_ENV_VARS: Record<string, string> = {
+  anthropic: 'ANTHROPIC_API_KEY',
+  openai:    'OPENAI_API_KEY',
+  google:    'GOOGLE_AI_API_KEY',
+};
+
+providers
+  .command('set-key <provider> <key>')
+  .description('Save an API key for a provider (stored in ~/.kratos/credentials.json)')
+  .action((provider: string, key: string) => {
+    const envVar = PROVIDER_ENV_VARS[provider.toLowerCase()];
+    if (!envVar) {
+      ui.error(`Unknown provider: "${provider}". Valid: ${Object.keys(PROVIDER_ENV_VARS).join(', ')}`);
+      process.exit(1);
+    }
+
+    let creds: Record<string, string> = {};
+    if (fs.existsSync(CREDENTIALS_PATH)) {
+      try { creds = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf-8')); } catch { /* ignore */ }
+    }
+
+    const dir = path.dirname(CREDENTIALS_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+    creds[envVar] = key;
+    fs.writeFileSync(CREDENTIALS_PATH, JSON.stringify(creds, null, 2), { mode: 0o600 });
+    ui.success(`API key for ${provider} saved to ${CREDENTIALS_PATH}`);
+    ui.info(`Environment variable: ${envVar}`);
+  });
+
+providers
+  .command('remove-key <provider>')
+  .description('Remove a saved API key for a provider')
+  .action((provider: string) => {
+    const envVar = PROVIDER_ENV_VARS[provider.toLowerCase()];
+    if (!envVar) {
+      ui.error(`Unknown provider: "${provider}". Valid: ${Object.keys(PROVIDER_ENV_VARS).join(', ')}`);
+      process.exit(1);
+    }
+
+    if (!fs.existsSync(CREDENTIALS_PATH)) {
+      ui.info('No credentials file found — nothing to remove.');
+      return;
+    }
+
+    let creds: Record<string, string> = {};
+    try { creds = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf-8')); } catch { /* ignore */ }
+
+    if (!creds[envVar]) {
+      ui.info(`No saved key found for ${provider}.`);
+      return;
+    }
+
+    delete creds[envVar];
+    fs.writeFileSync(CREDENTIALS_PATH, JSON.stringify(creds, null, 2), { mode: 0o600 });
+    ui.success(`API key for ${provider} removed.`);
+  });
+
+providers
+  .command('keys')
+  .description('Show which API keys are configured (values masked)')
+  .action(() => {
+    let fileCreds: Record<string, string> = {};
+    if (fs.existsSync(CREDENTIALS_PATH)) {
+      try { fileCreds = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf-8')); } catch { /* ignore */ }
+    }
+
+    ui.heading('API Keys');
+    for (const [name, envVar] of Object.entries(PROVIDER_ENV_VARS)) {
+      const value = process.env[envVar] || fileCreds[envVar];
+      const source = process.env[envVar] ? 'env var' : fileCreds[envVar] ? 'credentials file' : 'not set';
+      const masked = value
+        ? `${value.slice(0, 8)}****${value.slice(-4)}`
+        : '—';
+      ui.keyValue(name, `${masked}  (${source})`);
+    }
+    console.log('');
+    ui.info(`Credentials file: ${CREDENTIALS_PATH}`);
   });
 
 // ============================================================
@@ -359,7 +500,7 @@ cost
 
     const tracker = new BudgetTracker(mm);
     const report = await tracker.getSpend(opts.period as 'today' | 'week' | 'month' | 'all');
-    console.log(tracker.formatReport(report));
+    ui.raw(tracker.formatReport(report));
 
     await mm.close();
   });
@@ -371,7 +512,7 @@ cost
     const { CostRouter } = await import('../../providers/cost-router.js');
     const router = new CostRouter();
     const decision = router.route(workflow);
-    console.log(router.formatDecision(decision));
+    ui.raw(router.formatDecision(decision));
   });
 
 cost
@@ -387,10 +528,10 @@ cost
     const tracker = new BudgetTracker(mm);
     const savings = await tracker.calculateSavings(opts.period as 'today' | 'week' | 'month' | 'all');
 
-    console.log(`Cost Savings (${opts.period}):`);
-    console.log(`  Actual cost:    $${savings.actual_cost.toFixed(4)}`);
-    console.log(`  Opus baseline:  $${savings.opus_baseline.toFixed(4)}`);
-    console.log(`  Savings:        $${savings.savings.toFixed(4)} (${savings.savings_pct.toFixed(1)}%)`);
+    ui.heading(`Cost Savings (${opts.period})`);
+    ui.keyValue('Actual cost', `$${savings.actual_cost.toFixed(4)}`);
+    ui.keyValue('Opus baseline', `$${savings.opus_baseline.toFixed(4)}`);
+    ui.keyValue('Savings', `$${savings.savings.toFixed(4)} (${savings.savings_pct.toFixed(1)}%)`);
 
     await mm.close();
   });
@@ -411,12 +552,14 @@ validate
     await mm.init();
 
     const gt = new GroundTruth(mm, PROJECT_ROOT);
+    const s = ui.spinner('Refreshing ground truth...');
     await gt.refresh();
+    s.stop();
 
     const validator = new Validator(gt);
     const resolvedPath = path.resolve(artifactPath);
     const report = await validator.validate(resolvedPath);
-    console.log(validator.formatReport(report));
+    ui.raw(validator.formatReport(report));
 
     await mm.close();
     process.exit(report.pass ? 0 : 1);
@@ -432,12 +575,14 @@ validate
     await mm.init();
 
     const gt = new GroundTruth(mm, PROJECT_ROOT);
+    const s = ui.spinner('Scanning filesystem...');
     const result = await gt.refresh();
+    s.stop();
 
-    console.log(`Ground truth refreshed:`);
-    console.log(`  Facts stored: ${result.facts_stored}`);
+    ui.heading('Ground Truth Refreshed');
+    ui.keyValue('Facts stored', result.facts_stored);
     for (const [category, count] of Object.entries(result.categories)) {
-      console.log(`  ${category}: ${count}`);
+      ui.keyValue(category, count as number);
     }
 
     await mm.close();
@@ -457,21 +602,21 @@ validate
     const facts = await gt.getFacts(opts.category);
 
     if (facts.length === 0) {
-      console.log('No ground truth facts found. Run: kratos validate refresh-ground-truth');
+      ui.info('No ground truth facts found.');
+      ui.info('Run: kratos validate refresh-ground-truth');
     } else {
-      console.log(`Ground Truth Facts (${facts.length}):\n`);
+      ui.heading(`Ground Truth Facts (${facts.length})`);
       const grouped: Record<string, typeof facts> = {};
       for (const f of facts) {
         if (!grouped[f.category]) grouped[f.category] = [];
         grouped[f.category].push(f);
       }
       for (const [category, items] of Object.entries(grouped)) {
-        console.log(`  ${category} (${items.length}):`);
+        ui.subheading(`${category} (${items.length})`);
         for (const item of items.slice(0, 20)) {
-          console.log(`    ${item.key}: ${item.value}`);
+          ui.keyValue(item.key, item.value);
         }
-        if (items.length > 20) console.log(`    ... and ${items.length - 20} more`);
-        console.log('');
+        if (items.length > 20) ui.info(`... and ${items.length - 20} more`);
       }
     }
 
@@ -490,15 +635,15 @@ program
     await mm.init();
     const stats = await mm.getStats();
 
-    console.log('Kratos Status:');
-    console.log(`  Memory entries: ${stats.total_entries}`);
-    console.log(`  Stale entries: ${stats.stale_count}`);
+    ui.heading('Kratos Status');
+    ui.keyValue('Memory entries', stats.total_entries);
+    ui.keyValue('Stale entries', stats.stale_count);
 
     const statusPath = path.join(PROJECT_ROOT, 'docs', 'implementation-artifacts', 'sprint-status.yaml');
     if (fs.existsSync(statusPath)) {
-      console.log(`  Sprint status: ${statusPath}`);
+      ui.statusRow(true, 'Sprint status', statusPath);
     } else {
-      console.log('  Sprint status: No active sprint');
+      ui.statusRow(false, 'Sprint status', 'No active sprint');
     }
 
     await mm.close();
@@ -630,14 +775,19 @@ program
       detail: fs.existsSync(phase4Checkpoint) ? 'Completed' : 'Not found',
     });
 
-    console.log('Kratos Health Check:\n');
+    console.log('');
+    ui.heading('Kratos Health Check');
     let allPassed = true;
     for (const check of checks) {
-      const icon = check.passed ? 'PASS' : 'FAIL';
-      console.log(`  [${icon}] ${check.name} — ${check.detail}`);
+      ui.statusRow(check.passed, check.name, check.detail);
       if (!check.passed) allPassed = false;
     }
-    console.log(`\n${allPassed ? 'All checks passed.' : 'Some checks failed.'}`);
+    ui.divider();
+    if (allPassed) {
+      ui.success('All checks passed.');
+    } else {
+      ui.error('Some checks failed.');
+    }
     process.exit(allPassed ? 0 : 1);
   });
 
@@ -652,16 +802,17 @@ program
     const { spawn } = await import('child_process');
     const dashboardDir = path.join(PROJECT_ROOT, 'dashboard');
     if (!fs.existsSync(dashboardDir)) {
-      console.error('Dashboard directory not found.');
+      ui.error('Dashboard directory not found.');
       process.exit(1);
     }
-    console.log(`Launching dashboard on port ${opts.port}...`);
+    const s = ui.spinner(`Launching dashboard on port ${opts.port}...`);
     const child = spawn('npm', ['start'], {
       cwd: dashboardDir,
       stdio: 'inherit',
       env: { ...process.env, PORT: opts.port },
     });
-    child.on('error', (err: Error) => console.error('Failed to start dashboard:', err.message));
+    child.on('spawn', () => s.succeed(`Dashboard running on port ${opts.port}`));
+    child.on('error', (err: Error) => { s.fail(`Failed to start dashboard: ${err.message}`); });
   });
 
 // ============================================================
@@ -679,12 +830,13 @@ hooks
     await executor.loadConfig();
     const allHooks = executor.listHooks();
 
+    ui.heading('Lifecycle Hooks');
     for (const [point, defs] of Object.entries(allHooks)) {
       const hookDefs = defs as { command: string; on_fail: string }[];
       const count = hookDefs.length;
-      console.log(`${point}: ${count === 0 ? '(none)' : `${count} hook(s)`}`);
+      ui.subheading(`${point}: ${count === 0 ? '(none)' : `${count} hook(s)`}`);
       for (const def of hookDefs) {
-        console.log(`  → ${def.command} [on_fail: ${def.on_fail}]`);
+        ui.keyValue(def.command, `on_fail: ${def.on_fail}`, 6);
       }
     }
   });
@@ -698,18 +850,20 @@ hooks
     const executor = new HookExecutor(hooksConfigPath);
     await executor.loadConfig();
 
-    console.log(`Testing hook point: ${hookPoint}`);
+    const s = ui.spinner(`Testing hook point: ${hookPoint}...`);
     const results = await executor.execute(hookPoint, {
       workflow_name: 'test',
       step_number: 1,
       story_key: 'TEST-001',
     });
+    s.stop();
 
     if (results.length === 0) {
-      console.log('No hooks configured for this point.');
+      ui.info('No hooks configured for this point.');
     } else {
+      ui.heading(`Hook Results — ${hookPoint}`);
       for (const r of results) {
-        console.log(`  [${r.exit_code === 0 ? 'OK' : 'ERR'}] ${r.command} (${r.duration_ms}ms) → ${r.action_taken}`);
+        ui.statusRow(r.exit_code === 0, r.command, `${r.duration_ms}ms — ${r.action_taken}`);
       }
     }
   });
@@ -734,9 +888,9 @@ metrics
     try {
       const report = sm.calculate(statusPath);
       sm.recordMetrics(report);
-      console.log(sm.formatReport(report));
+      ui.raw(sm.formatReport(report));
     } catch (err) {
-      console.error((err as Error).message);
+      ui.error((err as Error).message);
       process.exit(1);
     }
     await mm.close();
@@ -754,7 +908,7 @@ metrics
     const am = new AgentMetrics(mm);
     const report = am.calculate();
     am.recordMetrics(report);
-    console.log(am.formatReport(report));
+    ui.raw(am.formatReport(report));
     await mm.close();
   });
 
@@ -770,7 +924,7 @@ metrics
     const qm = new QualityMetrics(mm);
     const report = qm.calculate();
     qm.recordMetrics(report);
-    console.log(qm.formatReport(report));
+    ui.raw(qm.formatReport(report));
     await mm.close();
   });
 
@@ -787,7 +941,7 @@ metrics
     const cm = new CostMetrics(mm);
     const report = cm.calculate(opts.period as 'today' | 'week' | 'month' | 'all');
     cm.recordMetrics(report);
-    console.log(cm.formatReport(report));
+    ui.raw(cm.formatReport(report));
     await mm.close();
   });
 
@@ -807,7 +961,7 @@ metrics
 
     if (opts.output) {
       fs.writeFileSync(opts.output, JSON.stringify(data, null, 2));
-      console.log(`Exported ${data.length} metrics to ${opts.output}`);
+      ui.success(`Exported ${data.length} metrics to ${opts.output}`);
     } else {
       console.log(JSON.stringify(data, null, 2));
     }
@@ -829,8 +983,10 @@ codebase
     await mm.init();
 
     const scanner = new CodebaseScanner(mm, PROJECT_ROOT);
+    const s = ui.spinner('Scanning codebase...');
     const result = scanner.scan();
-    console.log(scanner.formatReport(result));
+    s.stop();
+    ui.raw(scanner.formatReport(result));
     await mm.close();
   });
 
@@ -840,8 +996,10 @@ codebase
   .action(async () => {
     const { DriftDetector } = await import('../../observability/codebase/drift-detector.js');
     const detector = new DriftDetector(PROJECT_ROOT);
+    const s = ui.spinner('Detecting architecture drift...');
     const report = detector.detect();
-    console.log(detector.formatReport(report));
+    s.stop();
+    ui.raw(detector.formatReport(report));
     process.exit(report.drift_score > 50 ? 1 : 0);
   });
 
@@ -851,8 +1009,10 @@ codebase
   .action(async () => {
     const { DebtTracker } = await import('../../observability/codebase/debt-tracker.js');
     const tracker = new DebtTracker(PROJECT_ROOT);
+    const s = ui.spinner('Analyzing technical debt...');
     const report = tracker.analyze();
-    console.log(tracker.formatReport(report));
+    s.stop();
+    ui.raw(tracker.formatReport(report));
   });
 
 codebase
@@ -863,14 +1023,12 @@ codebase
     const tracker = new DebtTracker(PROJECT_ROOT);
     const report = tracker.analyze();
 
-    console.log('Codebase Hotspots');
-    console.log('='.repeat(50));
-    console.log('');
+    ui.heading('Codebase Hotspots');
     if (report.hotspots.length === 0) {
-      console.log('No hotspots detected.');
+      ui.info('No hotspots detected.');
     } else {
       for (const h of report.hotspots) {
-        console.log(`  ${h.file}: ${h.issues} issues`);
+        ui.keyValue(h.file, `${h.issues} issues`);
       }
     }
   });
@@ -882,7 +1040,7 @@ codebase
     const { OwnershipMap } = await import('../../observability/codebase/ownership-map.js');
     const ownership = new OwnershipMap(CHECKPOINT_DIR);
     const report = ownership.build();
-    console.log(ownership.formatReport(report));
+    ui.raw(ownership.formatReport(report));
   });
 
 codebase
@@ -896,15 +1054,14 @@ codebase
 
     const scanner = new CodebaseScanner(mm, PROJECT_ROOT);
     const stats = scanner.getStats();
-    console.log('Codebase Stats');
-    console.log('='.repeat(50));
-    console.log(`  Total files: ${stats.total_files}`);
-    console.log(`  Total lines: ${stats.total_lines.toLocaleString()}`);
-    console.log('');
-    console.log('By Language:');
+    ui.heading('Codebase Stats');
+    ui.keyValue('Total files', stats.total_files);
+    ui.keyValue('Total lines', stats.total_lines.toLocaleString());
+
+    ui.subheading('By Language');
     const sorted = Object.entries(stats.by_language).sort((a, b) => b[1] - a[1]);
     for (const [lang, count] of sorted) {
-      console.log(`  ${lang}: ${count} files`);
+      ui.keyValue(lang, `${count} files`);
     }
     await mm.close();
   });
@@ -931,7 +1088,7 @@ plugins
     const registry = new PluginRegistry(manifest, loader);
 
     const allPlugins = registry.discoverAndList();
-    console.log(registry.formatList(allPlugins));
+    ui.raw(registry.formatList(allPlugins));
   });
 
 plugins
@@ -950,11 +1107,11 @@ plugins
     const discovered = loader.discover();
 
     if (discovered.length === 0) {
-      console.log('No plugins discovered.');
+      ui.info('No plugins discovered.');
     } else {
-      console.log(`Discovered ${discovered.length} plugin(s):`);
+      ui.heading(`Discovered ${discovered.length} plugin(s)`);
       for (const p of discovered) {
-        console.log(`  ${p.name} (${p.type}) — ${p.has_manifest ? 'has manifest' : 'no manifest'}`);
+        ui.keyValue(p.name, `${p.type} — ${p.has_manifest ? 'has manifest' : 'no manifest'}`);
       }
     }
   });
@@ -973,21 +1130,25 @@ plugins
     manifest.load();
     const plugin = manifest.getPlugin(name);
     if (!plugin) {
-      console.error(`Plugin not found: ${name}`);
+      ui.error(`Plugin not found: ${name}`);
       process.exit(1);
     }
 
     const loader = new PluginLoader(pluginsDir, manifest);
     const result = loader.validate(plugin);
 
-    console.log(`Validation for ${name}: ${result.valid ? 'VALID' : 'INVALID'}`);
+    if (result.valid) {
+      ui.success(`Validation for ${name}: VALID`);
+    } else {
+      ui.error(`Validation for ${name}: INVALID`);
+    }
     if (result.errors.length > 0) {
-      console.log('Errors:');
-      for (const e of result.errors) console.log(`  ${e}`);
+      ui.subheading('Errors');
+      for (const e of result.errors) ui.error(e);
     }
     if (result.warnings.length > 0) {
-      console.log('Warnings:');
-      for (const w of result.warnings) console.log(`  ${w}`);
+      ui.subheading('Warnings');
+      for (const w of result.warnings) ui.warn(w);
     }
     process.exit(result.valid ? 0 : 1);
   });
@@ -1008,7 +1169,7 @@ plugins
     const loader = new PluginLoader(pluginsDir, manifest);
     const registry = new PluginRegistry(manifest, loader);
     const result = registry.enable(name);
-    console.log(result.message);
+    result.success ? ui.success(result.message) : ui.error(result.message);
     process.exit(result.success ? 0 : 1);
   });
 
@@ -1028,7 +1189,7 @@ plugins
     const loader = new PluginLoader(pluginsDir, manifest);
     const registry = new PluginRegistry(manifest, loader);
     const result = registry.disable(name);
-    console.log(result.message);
+    result.success ? ui.success(result.message) : ui.error(result.message);
     process.exit(result.success ? 0 : 1);
   });
 
@@ -1051,12 +1212,12 @@ plugins
 
     const validTypes = ['agent', 'workflow', 'skill', 'task', 'hook'];
     if (!validTypes.includes(opts.type)) {
-      console.error(`Invalid type: ${opts.type}. Must be one of: ${validTypes.join(', ')}`);
+      ui.error(`Invalid type: ${opts.type}. Must be one of: ${validTypes.join(', ')}`);
       process.exit(1);
     }
 
     const result = registry.create(name, opts.type as 'agent' | 'workflow' | 'skill' | 'task' | 'hook');
-    console.log(result.message);
+    result.success ? ui.success(result.message) : ui.error(result.message);
     process.exit(result.success ? 0 : 1);
   });
 
@@ -1071,10 +1232,12 @@ context
   .action(async () => {
     const { ContextCache } = await import('../engine/context-cache.js');
     const cache = new ContextCache(KRATOS_ROOT);
+    const s = ui.spinner('Building context caches...');
     const contexts = cache.buildAll();
-    console.log(`Built context caches for ${contexts.length} agent(s).`);
+    s.stop();
+    ui.success(`Built context caches for ${contexts.length} agent(s).`);
     for (const ctx of contexts) {
-      console.log(`  ${ctx.agent_id}: ${ctx.estimated_tokens.toLocaleString()} tokens (${ctx.total_lines} lines)`);
+      ui.keyValue(ctx.agent_id, `${ctx.estimated_tokens.toLocaleString()} tokens (${ctx.total_lines} lines)`);
     }
   });
 
@@ -1085,7 +1248,7 @@ context
     const { ContextCache } = await import('../engine/context-cache.js');
     const cache = new ContextCache(KRATOS_ROOT);
     const stats = cache.getStats();
-    console.log(cache.formatStats(stats));
+    ui.raw(cache.formatStats(stats));
   });
 
 context
@@ -1095,7 +1258,7 @@ context
     const { ContextCache } = await import('../engine/context-cache.js');
     const cache = new ContextCache(KRATOS_ROOT);
     const count = cache.invalidate();
-    console.log(`Invalidated ${count} cache file(s).`);
+    ui.success(`Invalidated ${count} cache file(s).`);
   });
 
 context
@@ -1107,18 +1270,19 @@ context
 
     if (agentId) {
       const result = cache.checkBudget(agentId);
-      console.log(`Budget check for ${agentId}:`);
-      console.log(`  Tokens:  ${result.tokens.toLocaleString()}`);
-      console.log(`  Budget:  ${result.budget.toLocaleString()}`);
-      console.log(`  Fits:    ${result.fits ? 'YES' : 'NO'}`);
+      ui.heading(`Budget Check — ${agentId}`);
+      ui.keyValue('Tokens', result.tokens.toLocaleString());
+      ui.keyValue('Budget', result.budget.toLocaleString());
+      ui.statusRow(result.fits, 'Within budget');
       if (result.overage > 0) {
-        console.log(`  Overage: ${result.overage.toLocaleString()} tokens`);
+        ui.keyValue('Overage', `${result.overage.toLocaleString()} tokens`);
       }
     } else {
       const stats = cache.getStats();
-      console.log(`Context budget: ${stats.budget_max.toLocaleString()} tokens`);
-      console.log(`Max usage:      ${stats.budget_used_pct.toFixed(1)}%`);
-      console.log(`Agents cached:  ${stats.agents_cached}`);
+      ui.heading('Context Budget');
+      ui.keyValue('Budget max', `${stats.budget_max.toLocaleString()} tokens`);
+      ui.keyValue('Max usage', `${stats.budget_used_pct.toFixed(1)}%`);
+      ui.keyValue('Agents cached', stats.agents_cached);
     }
   });
 
@@ -1134,17 +1298,487 @@ context
     if (skillName) {
       const sections = idx.listSections(skillName);
       if (sections.length === 0) {
-        console.log(`No sections found for skill: ${skillName}`);
+        ui.info(`No sections found for skill: ${skillName}`);
       } else {
-        console.log(`Sections for ${skillName}:`);
+        ui.heading(`Sections — ${skillName}`);
         for (const s of sections) {
-          console.log(`  ${s.heading} (${s.line_count} lines)`);
+          ui.keyValue(s.heading, `${s.line_count} lines`);
         }
       }
     } else {
       const index = idx.build();
-      console.log(idx.formatIndex(index));
+      ui.raw(idx.formatIndex(index));
     }
   });
 
-program.parse();
+// ============================================================
+// AGENT COMMANDS
+// ============================================================
+const agent = program.command('agent').description('Run Kratos agents interactively');
+
+agent
+  .command('list')
+  .description('List all available Kratos agents')
+  .action(async () => {
+    await ui.init();
+    try {
+      const agents = listAgents(KRATOS_ROOT);
+      ui.heading('Kratos Agents');
+      ui.table(
+        ['Name', 'Persona', 'Title', 'Module'],
+        agents.map(a => [a.name, `${a.icon} ${a.displayName}`, a.title, a.module])
+      );
+      console.log('');
+      ui.info(`Run ${ui.theme().accent('kratos agent run <name>')} to start a session.`);
+      console.log('');
+    } catch (err: unknown) {
+      ui.error(err instanceof Error ? err.message : String(err));
+      process.exit(1);
+    }
+  });
+
+agent
+  .command('info <name>')
+  .description('Show details for a specific agent')
+  .action(async (name: string) => {
+    await ui.init();
+    const entry = findAgent(KRATOS_ROOT, name);
+    if (!entry) {
+      ui.error(`Unknown agent: "${name}"`);
+      ui.info(`Run ${ui.theme().accent('kratos agent list')} to see all agents.`);
+      process.exit(1);
+    }
+    const details = getAgentDetails(entry, PROJECT_ROOT);
+    ui.heading(`${entry.icon}  ${entry.displayName}`);
+    ui.keyValue('Name', entry.name);
+    ui.keyValue('Title', entry.title);
+    ui.keyValue('Module', entry.module);
+    ui.keyValue('Path', entry.path);
+    ui.keyValue('Extends', details.extends);
+    if (details.capabilities !== '—') ui.keyValue('Capabilities', details.capabilities);
+    if (details.mission !== '—') {
+      ui.subheading('Mission');
+      console.log(`    ${ui.theme().dim(details.mission)}`);
+    }
+    if (details.owns !== '—') {
+      ui.subheading('Owns');
+      console.log(`    ${ui.theme().dim(details.owns)}`);
+    }
+    console.log('');
+    ui.info(`Start session: ${ui.theme().accent('kratos agent run ' + entry.name)}`);
+    console.log('');
+  });
+
+agent
+  .command('run <name>')
+  .description('Start an interactive Claude session with an agent')
+  .option('-m, --model <tier>', 'Model tier: fast | standard | deep', 'standard')
+  .option('--no-stream', 'Disable streaming responses')
+  .action(async (name: string, opts: { model: string; stream: boolean }) => {
+    await ui.init();
+    const tier = (['fast', 'standard', 'deep'].includes(opts.model)
+      ? opts.model
+      : 'standard') as 'fast' | 'standard' | 'deep';
+    await startSession(name, KRATOS_ROOT, PROJECT_ROOT, {
+      model: tier,
+      stream: opts.stream,
+    });
+  });
+
+// Shorthand: `kratos agent <name>` without explicit `run` subcommand
+agent
+  .argument('[name]')
+  .option('-m, --model <tier>', 'Model tier: fast | standard | deep', 'standard')
+  .option('--no-stream', 'Disable streaming responses')
+  .action(async (name: string | undefined, opts: { model: string; stream: boolean }) => {
+    if (!name) {
+      agent.outputHelp();
+      return;
+    }
+    await ui.init();
+    const tier = (['fast', 'standard', 'deep'].includes(opts.model)
+      ? opts.model
+      : 'standard') as 'fast' | 'standard' | 'deep';
+    await startSession(name, KRATOS_ROOT, PROJECT_ROOT, {
+      model: tier,
+      stream: opts.stream,
+    });
+  });
+
+// ============================================================
+// REPL — Command registry, smart suggestions, inline hints
+// ============================================================
+
+interface CmdEntry {
+  cmd: string;
+  desc: string;
+  group: string;
+  tags: string[];
+}
+
+const COMMAND_REGISTRY: CmdEntry[] = [
+  // memory
+  { cmd: 'memory search',          desc: 'Semantic search across agent memory',             group: 'memory',    tags: ['search','find','query'] },
+  { cmd: 'memory stats',           desc: 'Memory entry counts by partition/agent',          group: 'memory',    tags: ['stats','count'] },
+  { cmd: 'memory export',          desc: 'Export memory to markdown sidecars',              group: 'memory',    tags: ['export','backup'] },
+  { cmd: 'memory migrate',         desc: 'Import markdown sidecars into database',          group: 'memory',    tags: ['import','migrate'] },
+  { cmd: 'memory expire',          desc: 'Remove expired memory entries',                   group: 'memory',    tags: ['clean','prune','expire'] },
+  // learn
+  { cmd: 'learn distill',          desc: 'Extract patterns from scored trajectories',       group: 'learn',     tags: ['patterns','distill','train'] },
+  { cmd: 'learn patterns',         desc: 'List learned patterns and anti-patterns',         group: 'learn',     tags: ['patterns','list'] },
+  { cmd: 'learn protect',          desc: 'Run forgetting-shield protection cycle',          group: 'learn',     tags: ['protect','shield','forgetting'] },
+  // sprint
+  { cmd: 'sprint plan',            desc: 'Generate parallel execution plan',                group: 'sprint',    tags: ['plan','parallel','schedule'] },
+  { cmd: 'sprint reviews',         desc: 'Run all 6 review gates in parallel',              group: 'sprint',    tags: ['review','gates','qa'] },
+  // providers
+  { cmd: 'providers list',                     desc: 'Show configured LLM providers',              group: 'providers', tags: ['list','llm','models'] },
+  { cmd: 'providers test',                     desc: 'Send test prompt to a provider',              group: 'providers', tags: ['test','ping','check'] },
+  { cmd: 'providers cost-estimate',            desc: 'Estimate sprint cost across providers',       group: 'providers', tags: ['cost','estimate','budget'] },
+  { cmd: 'providers set-key <provider> <key>', desc: 'Save an API key for a provider',              group: 'providers', tags: ['key','api','auth','credentials','set'] },
+  { cmd: 'providers remove-key <provider>',    desc: 'Remove a saved API key',                      group: 'providers', tags: ['key','remove','delete'] },
+  { cmd: 'providers keys',                     desc: 'Show configured API keys (masked)',            group: 'providers', tags: ['key','list','show','auth'] },
+  // cost
+  { cmd: 'cost report',            desc: 'Show cost report by period',                      group: 'cost',      tags: ['report','spend','billing'] },
+  { cmd: 'cost route',             desc: 'Preview model-routing decision for a workflow',   group: 'cost',      tags: ['route','routing','model'] },
+  { cmd: 'cost savings',           desc: 'Show savings vs all-Opus baseline',               group: 'cost',      tags: ['savings','baseline','compare'] },
+  // validate
+  { cmd: 'validate artifact',      desc: 'Validate artifact claims against ground truth',   group: 'validate',  tags: ['validate','check','artifact'] },
+  { cmd: 'validate refresh-ground-truth', desc: 'Rescan filesystem and update ground truth',group: 'validate',  tags: ['refresh','scan','filesystem'] },
+  { cmd: 'validate ground-truth',  desc: 'Show cached ground-truth facts',                  group: 'validate',  tags: ['facts','ground-truth','cache'] },
+  // root
+  { cmd: 'status',                 desc: 'Current sprint status + agent health',            group: 'root',      tags: ['status','health','overview'] },
+  { cmd: 'doctor',                 desc: 'Run system health check',                         group: 'root',      tags: ['health','check','diagnose','doctor'] },
+  { cmd: 'dashboard',              desc: 'Launch web dashboard',                            group: 'root',      tags: ['dashboard','web','ui','browser'] },
+  // hooks
+  { cmd: 'hooks list',             desc: 'List all configured lifecycle hooks',              group: 'hooks',     tags: ['list','hooks'] },
+  { cmd: 'hooks test',             desc: 'Test-fire a hook point with sample context',      group: 'hooks',     tags: ['test','fire','trigger'] },
+  // metrics
+  { cmd: 'metrics sprint',         desc: 'Sprint velocity, burndown, and health',           group: 'metrics',   tags: ['sprint','velocity','burndown'] },
+  { cmd: 'metrics agents',         desc: 'Agent leaderboard with pass rates',               group: 'metrics',   tags: ['agents','leaderboard','passrate'] },
+  { cmd: 'metrics quality',        desc: 'First-pass rate and quality score',               group: 'metrics',   tags: ['quality','score','firstpass'] },
+  { cmd: 'metrics cost',           desc: 'Cost per story, tier distribution, forecast',     group: 'metrics',   tags: ['cost','forecast','tiers'] },
+  { cmd: 'metrics export',         desc: 'Export all metrics as JSON',                      group: 'metrics',   tags: ['export','json','download'] },
+  // codebase
+  { cmd: 'codebase scan',          desc: 'Incremental codebase scan with checksums',        group: 'codebase',  tags: ['scan','index','checksums'] },
+  { cmd: 'codebase drift',         desc: 'Detect architecture doc vs reality drift',        group: 'codebase',  tags: ['drift','architecture','gap'] },
+  { cmd: 'codebase debt',          desc: 'Detect tech debt: complexity, size, test gaps',   group: 'codebase',  tags: ['debt','complexity','technical'] },
+  { cmd: 'codebase hotspots',      desc: 'Files with most issues and changes',              group: 'codebase',  tags: ['hotspots','issues','files'] },
+  { cmd: 'codebase ownership',     desc: 'File-to-story-to-agent ownership map',            group: 'codebase',  tags: ['ownership','map','traceability'] },
+  { cmd: 'codebase stats',         desc: 'Codebase size and language breakdown',            group: 'codebase',  tags: ['stats','languages','size'] },
+  // plugins
+  { cmd: 'plugins list',           desc: 'List all discovered and registered plugins',      group: 'plugins',   tags: ['list'] },
+  { cmd: 'plugins discover',       desc: 'Scan plugins directory for unregistered',         group: 'plugins',   tags: ['discover','scan','find'] },
+  { cmd: 'plugins validate',       desc: 'Validate a plugin definition',                    group: 'plugins',   tags: ['validate','check'] },
+  { cmd: 'plugins enable',         desc: 'Enable a registered plugin',                      group: 'plugins',   tags: ['enable','activate','on'] },
+  { cmd: 'plugins disable',        desc: 'Disable a registered plugin',                     group: 'plugins',   tags: ['disable','deactivate','off'] },
+  { cmd: 'plugins create',         desc: 'Create a new plugin scaffold',                    group: 'plugins',   tags: ['create','scaffold','new','generate'] },
+  // context
+  { cmd: 'context build',          desc: 'Pre-compile agent context caches',                group: 'context',   tags: ['build','compile','cache'] },
+  { cmd: 'context stats',          desc: 'Context cache statistics and savings estimate',   group: 'context',   tags: ['stats','cache','tokens'] },
+  { cmd: 'context invalidate',     desc: 'Clear all context caches',                        group: 'context',   tags: ['clear','reset','invalidate'] },
+  { cmd: 'context budget',         desc: 'Check agent context fits 40K token budget',       group: 'context',   tags: ['budget','tokens','limit'] },
+  { cmd: 'context skill-sections', desc: 'List skill sections for JIT loading',             group: 'context',   tags: ['skills','sections','jit'] },
+  // agent
+  { cmd: 'agent list',             desc: 'List all 17 available Kratos agents',             group: 'agent',     tags: ['list','agents','show'] },
+  { cmd: 'agent info <name>',      desc: 'Show details for a specific agent',               group: 'agent',     tags: ['info','details','inspect'] },
+  { cmd: 'agent run <name>',       desc: 'Start an interactive Claude session as an agent', group: 'agent',     tags: ['run','start','session','chat','interactive'] },
+];
+
+// Context-aware next-step suggestions keyed by resolved command
+const NEXT_STEPS: Record<string, string[]> = {
+  'doctor':                    ['status', 'providers list', 'memory stats'],
+  'status':                    ['sprint plan', 'metrics sprint', 'codebase scan'],
+  'memory stats':              ['memory search', 'learn distill', 'memory export'],
+  'memory search':             ['learn patterns', 'memory stats'],
+  'memory expire':             ['memory stats', 'learn distill'],
+  'memory migrate':            ['memory stats', 'memory export'],
+  'learn distill':             ['learn patterns', 'learn protect'],
+  'learn patterns':            ['learn protect', 'memory stats'],
+  'learn protect':             ['memory stats', 'learn distill'],
+  'sprint plan':               ['sprint reviews', 'metrics sprint'],
+  'sprint reviews':            ['metrics sprint', 'metrics quality'],
+  'codebase scan':             ['codebase drift', 'codebase debt', 'codebase hotspots'],
+  'codebase drift':            ['codebase debt', 'validate refresh-ground-truth'],
+  'codebase debt':             ['codebase hotspots', 'codebase ownership'],
+  'codebase hotspots':         ['codebase debt', 'codebase ownership'],
+  'metrics sprint':            ['metrics agents', 'metrics quality', 'metrics cost'],
+  'metrics agents':            ['metrics quality', 'learn patterns'],
+  'metrics quality':           ['metrics sprint', 'metrics cost'],
+  'providers list':            ['providers keys', 'providers test', 'providers cost-estimate'],
+  'providers test':            ['providers list', 'providers set-key', 'cost report'],
+  'providers keys':            ['providers set-key', 'providers list', 'providers test'],
+  'providers set-key':         ['providers keys', 'providers test', 'providers list'],
+  'validate artifact':         ['validate refresh-ground-truth', 'validate ground-truth'],
+  'validate refresh-ground-truth': ['validate artifact', 'validate ground-truth'],
+  'context build':             ['context stats', 'context budget'],
+  'context stats':             ['context build', 'context budget'],
+  'plugins list':              ['plugins discover', 'plugins validate'],
+  'plugins create':            ['plugins list', 'plugins enable'],
+};
+
+// Groups that match a single keyword (for "memory" → list memory subcommands)
+const COMMAND_GROUPS = ['memory','learn','sprint','providers','cost','validate',
+                        'hooks','metrics','codebase','plugins','context','agent'];
+
+// ── Levenshtein distance for fuzzy matching ──────────────────
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) =>
+    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+  );
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1]
+        ? dp[i-1][j-1]
+        : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function fuzzyFind(input: string): CmdEntry[] {
+  return COMMAND_REGISTRY
+    .map(e => ({ entry: e, dist: levenshtein(input, e.cmd.split(' ')[0]) }))
+    .filter(x => x.dist <= 3)
+    .sort((a, b) => a.dist - b.dist)
+    .map(x => x.entry)
+    .slice(0, 4);
+}
+
+// ── Hint: dim text after cursor (fish-shell style) ───────────
+let ghostActive = false;
+const ESC = '\x1b';
+
+function clearGhost(): void {
+  ghostActive = false;
+}
+
+function paintGhost(rl: readline.Interface, currentLine: string): void {
+  if (!process.stdout.isTTY) return;
+  const lower = currentLine.toLowerCase();
+  if (lower.length < 2) return;
+  const hit = COMMAND_REGISTRY.find(e => e.cmd.startsWith(lower) && e.cmd !== lower);
+  if (!hit) return;
+  const ghost = hit.cmd.slice(currentLine.length);
+  if (!ghost) return;
+  // save cursor → dim ghost text → restore cursor
+  process.stdout.write(`${ESC}7${ESC}[2m${ghost}${ESC}[0m${ESC}8`);
+  ghostActive = true;
+}
+
+// ── Post-command "next steps" panel ─────────────────────────
+function showNextSteps(cmd: string): void {
+  const steps = NEXT_STEPS[cmd];
+  if (!steps || steps.length === 0) return;
+  const t = ui.theme?.() ?? null;
+  if (!t) return;
+  console.log('');
+  console.log(`  ${t.dim('╌╌ suggested next ╌╌')}`);
+  for (const s of steps.slice(0, 3)) {
+    const entry = COMMAND_REGISTRY.find(e => e.cmd === s);
+    const desc = entry ? `  ${t.dim('·')} ${t.dim(entry.desc)}` : '';
+    console.log(`    ${t.accent(s)}${desc}`);
+  }
+}
+
+// ── Show group subcommands ───────────────────────────────────
+function showGroupHelp(group: string): void {
+  const entries = COMMAND_REGISTRY.filter(e => e.group === group);
+  if (entries.length === 0) return;
+  const t = ui.theme?.() ?? null;
+  if (!t) return;
+  console.log('');
+  console.log(`  ${t.heading(` ${group} commands `)}`);
+  for (const e of entries) {
+    const padded = e.cmd.padEnd(34);
+    console.log(`    ${t.accent(padded)}${t.dim(e.desc)}`);
+  }
+  console.log('');
+}
+
+// ── REPL entrypoint ──────────────────────────────────────────
+async function startRepl(isRestart = false): Promise<void> {
+  await ui.init();
+  if (!isRestart) await showSplash();
+
+  // Remove any stale keypress listeners from a previous REPL or agent session
+  // to prevent duplicate echo (each listener would re-echo every keystroke).
+  process.stdin.removeAllListeners('keypress');
+
+  const completer = (line: string): [string[], string] => {
+    const lower = line.toLowerCase().trim();
+    if (!lower) {
+      const groups = COMMAND_GROUPS;
+      const roots = COMMAND_REGISTRY.filter(e => e.group === 'root').map(e => e.cmd);
+      return [[...groups, ...roots], line];
+    }
+    const hits = COMMAND_REGISTRY.filter(e => e.cmd.startsWith(lower));
+    if (hits.length > 0) return [hits.map(e => e.cmd), line];
+    const tagHits = COMMAND_REGISTRY.filter(e =>
+      e.tags.some(t => t.startsWith(lower)) || e.desc.toLowerCase().includes(lower)
+    );
+    return [tagHits.map(e => e.cmd), line];
+  };
+
+  const rl: readline.Interface = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    prompt: '\nkratos> ',
+    completer,
+  });
+
+  // Set up keypress-based inline ghost text
+  if (process.stdout.isTTY) {
+    readline.emitKeypressEvents(process.stdin, rl);
+
+    process.stdin.on('keypress', (_ch: string | undefined, key: readline.Key | undefined) => {
+      // Clear existing ghost on any destructive key
+      if (key?.name === 'backspace' || key?.name === 'delete' ||
+          key?.name === 'return'    || key?.name === 'enter'  ||
+          key?.ctrl) {
+        clearGhost();
+        return;
+      }
+      // After readline redraws, paint suggestion
+      setImmediate(() => {
+        const currentLine = (rl as unknown as { line: string }).line ?? '';
+        paintGhost(rl, currentLine);
+      });
+    });
+  }
+
+  const t = ui.theme();
+  console.log(`  ${t.dim('Tab')} complete  ${t.dim('↑↓')} history  ${t.dim('"?"')} categories  ${t.dim('Ctrl+D')} exit\n`);
+  rl.prompt();
+
+  rl.on('line', (line: string) => {
+    clearGhost();
+    const input = line.trim();
+
+    if (!input) {
+      rl.prompt();
+      return;
+    }
+
+    // ── built-in builtins ──
+    if (input === 'exit' || input === 'quit') {
+      console.log('\n  Goodbye!\n');
+      rl.close();
+      process.exit(0);
+    }
+
+    if (input === 'clear' || input === 'cls') {
+      console.clear();
+      rl.prompt();
+      return;
+    }
+
+    if (input === 'help') {
+      program.outputHelp();
+      rl.prompt();
+      return;
+    }
+
+    if (input === '?' || input === 'commands') {
+      for (const grp of COMMAND_GROUPS) {
+        showGroupHelp(grp);
+      }
+      rl.prompt();
+      return;
+    }
+
+    // ── group name alone → show group subcommands ──
+    if (COMMAND_GROUPS.includes(input)) {
+      showGroupHelp(input);
+      rl.prompt();
+      return;
+    }
+
+    // ── unknown command? fuzzy "did you mean?" ──
+    const knownCmd = COMMAND_REGISTRY.some(e => {
+      const normalized = e.cmd.replace(/ <[^>]+>/g, '').replace(/ \[[^\]]+\]/g, '');
+      return input === normalized || input.startsWith(normalized + ' ');
+    });
+
+    if (!knownCmd) {
+      const suggestions = fuzzyFind(input);
+      if (suggestions.length > 0) {
+        const th = ui.theme();
+        console.log(`\n  ${th.warn('Unknown command.')} Did you mean:`);
+        for (const s of suggestions) {
+          console.log(`    ${th.accent(s.cmd)}  ${th.dim(s.desc)}`);
+        }
+        console.log('');
+      } else {
+        const th = ui.theme();
+        console.log(`\n  ${th.warn(`Unknown command: "${input}".`)} Type ${th.accent('"?"')} to list all commands.\n`);
+      }
+      rl.prompt();
+      return;
+    }
+
+    // ── agent run <name> — run inline to avoid dual-readline rendering artifacts ──
+    const args = input.split(/\s+/);
+    if (args[0] === 'agent' && args[1] === 'run' && args[2]) {
+      const agentName = args[2];
+      const modelTier = (args[3] as 'fast' | 'standard' | 'deep') || undefined;
+      // Close this REPL's readline so it doesn't conflict with the agent session
+      rl.removeAllListeners('close');
+      rl.removeAllListeners('SIGINT');
+      rl.close();
+      (async () => {
+        await startSession(agentName, KRATOS_ROOT, PROJECT_ROOT, { model: modelTier }).catch(() => {});
+        // Session ended normally — restart the REPL (skip splash, clean up listeners)
+        await startRepl(true);
+      })();
+      return;
+    }
+
+    // ── run as subprocess so Commander state stays clean ──
+    const scriptPath = process.argv[1];
+    rl.pause();
+
+    const child = spawn(process.execPath, [scriptPath, ...args], {
+      stdio: 'inherit',
+      env: process.env,
+    });
+
+    child.on('close', () => {
+      // Resolve the matched command (strip arguments) for next-step suggestions
+      const resolvedCmd = COMMAND_REGISTRY.find(e => {
+        const base = e.cmd.replace(/ <[^>]+>/g,'').replace(/ \[[^\]]+\]/g,'');
+        return input === base || input.startsWith(base + ' ');
+      })?.cmd.replace(/ <[^>]+>/g,'').replace(/ \[[^\]]+\]/g,'');
+      if (resolvedCmd) showNextSteps(resolvedCmd);
+      rl.resume();
+      rl.prompt();
+    });
+
+    child.on('error', (err: Error) => {
+      const th = ui.theme();
+      console.error(`\n  ${th.fail ? th.fail('Error: ') : 'Error: '}${err.message}\n`);
+      rl.resume();
+      rl.prompt();
+    });
+  });
+
+  // Ctrl+C — keep running, remind user
+  rl.on('SIGINT', () => {
+    clearGhost();
+    const th = ui.theme();
+    console.log(`\n  ${th.dim('(Ctrl+D or "exit" to quit)')}`);
+    rl.prompt();
+  });
+
+  // Ctrl+D / stream close
+  rl.on('close', () => {
+    console.log('');
+    process.exit(0);
+  });
+}
+
+if (process.argv.length > 2) {
+  // Arguments supplied — one-shot command, exit when done (original behaviour)
+  ui.init().then(() => program.parseAsync(process.argv));
+} else {
+  // No arguments — enter interactive REPL
+  startRepl();
+}
