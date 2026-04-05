@@ -1,6 +1,6 @@
 # Kratos Framework v1.27.57
 
-This project uses the **KRATOS** (Generative Agile Intelligence Architecture) framework — an AI agent framework for Claude Code that orchestrates software product development through 15 operational agents, 71 workflows, and 8 shared skills. KRATOS is the lightweight edition of [GAIA](https://github.com/jlouage/Gaia-framework) (25 agents) — optimized for fast, low-token-cost workflows. GitHub Copilot support is provided separately through `.github/copilot-instructions.md` because Copilot does not consume Claude slash-command frontmatter.
+This project uses the **KRATOS** (Generative Agile Intelligence Architecture) framework — an AI agent framework for Claude Code that orchestrates software product development through 15 operational agents, 71 workflows, and 8 shared skills — optimized for fast, low-token-cost workflows. GitHub Copilot support is provided separately through `.github/copilot-instructions.md` because Copilot does not consume Claude slash-command frontmatter.
 
 ## How to Start
 

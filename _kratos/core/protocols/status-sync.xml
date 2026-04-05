@@ -42,7 +42,7 @@ Called by any workflow that changes story status. Ensures all files stay in sync
       priority: {from frontmatter}
       risk: {from frontmatter}
       author: {from frontmatter}
-      file: {story filename, e.g., "E9-S13-consolidate-dual-gaia-and-memory-directories.md"}
+      file: {story filename, e.g., "E9-S13-consolidate-dual-kratos-and-memory-directories.md"}
     Update last_updated timestamp.</action>
   <action>Write back story-index.yaml. Non-blocking — if write fails, log warning and continue. The index is a performance optimization, not a source of truth.</action>
 </step>

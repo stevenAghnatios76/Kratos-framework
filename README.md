@@ -7,10 +7,6 @@
 
 AI agent framework for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [GitHub Copilot](https://github.com/features/copilot) that orchestrates software product development through **15 specialized agents**, **64 workflows**, and **8 shared skills** — from initial research all the way to deployment.
 
-KRATOS is a fork of the original GAIA framework. Upstream attribution: https://github.com/jlouage/Gaia-framework
-
-> **KRATOS is the lightweight edition of GAIA.** It ships with 15 agents optimized for fast, low-token-cost development workflows. If you need the full 25-agent experience — including a dedicated Technical Writer (Iris), Data Engineer (Milo), Performance Specialist (Juno), and 6 individual Creative agents — use the [GAIA framework](https://github.com/jlouage/Gaia-framework), the parent project this was forked from.
-
 ### Why KRATOS?
 
 Using Claude Code or GitHub Copilot alone, you prompt an AI assistant. With KRATOS, you manage a **team of AI specialists** that follow a proven product lifecycle:
@@ -19,6 +15,7 @@ Using Claude Code or GitHub Copilot alone, you prompt an AI assistant. With KRAT
 - **15 specialized agents** — each with a persona, domain expertise, and persistent memory that improves over time
 - **Built-in quality gates** — 17 enforced gates that HALT workflows when standards aren't met (not advisory — hard stops)
 - **6-gate review process** — every story passes code review, QA, security, test automation, test review, and performance review before completion
+- **Role-based developers** — senior frontend, backend, and fullstack developers instead of language-specific agents, for broader stack coverage
 - **Checkpoint/resume** — long-running workflows survive context loss with sha256-verified checkpoints
 - **Brownfield support** — onboard existing codebases with automated discovery, documentation generation, and gap analysis
 
@@ -250,7 +247,7 @@ Six creative specializations are consolidated into two context-efficient composi
 | Creative Ideation | Rex / Nova / Lyra | Brainstorming, problem-solving, design thinking | `/kratos-agent-brainstorming`, `/kratos-problem-solving`, `/kratos-design-thinking` |
 | Creative Communications | Orion / Elara / Vermeer | Innovation strategy, storytelling, presentations | `/kratos-agent-innovation`, `/kratos-storytelling`, `/kratos-slide-deck` |
 
-> For dedicated single-persona creative agents (Rex, Nova, Lyra, Orion, Elara, Vermeer as separate files), see [GAIA](https://github.com/jlouage/Gaia-framework).
+> Creative specializations are consolidated into two composite agents for lower token cost. Each agent loads only the relevant section per workflow invocation.
 
 ### Testing Agent
 
@@ -468,7 +465,7 @@ _kratos/
 
 | Component | Count |
 |-----------|-------|
-| Agents | 15 with distinct personas (25 in [GAIA](https://github.com/jlouage/Gaia-framework)) |
+| Agents | 15 with distinct personas |
 | Workflows | 64 across 5 lifecycle phases |
 | Standalone tasks | 15 (reviews, audits, utilities) |
 | Slash commands | 102 |
@@ -509,7 +506,7 @@ Each agent has a persistent memory sidecar (`_kratos/_memory/*-sidecar/`) that s
 ## Limitations
 
 - **Single-user only** — KRATOS uses markdown files for state management (stories, sprint status, architecture docs). Multiple team members editing the same project will run into file conflicts.
-- **Claude Code required** — KRATOS is built specifically for Claude Code and cannot run on other AI coding assistants.
+- **Claude Code or GitHub Copilot required** — KRATOS is built for Claude Code and GitHub Copilot and cannot run on other AI coding assistants.
 - **Context budget** — Complex workflows can consume significant context. The framework enforces a 40K token budget per activation with just-in-time loading to manage this, but very large projects may hit limits.
 
 ---

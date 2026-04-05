@@ -1,11 +1,10 @@
 # KRATOS Workspace Instructions for GitHub Copilot
 
-This repository contains KRATOS, a fork of the original GAIA framework.
+This repository contains the KRATOS framework.
 
 ## Core rules
 
 - Use KRATOS naming, paths, and commands: `kratos-framework`, `/kratos-*`, `_kratos/`.
-- Preserve explicit upstream attribution when editing docs: KRATOS is forked from `https://github.com/jlouage/Gaia-framework`.
 - Prefer role-based developer agents over language-specific personas.
   Current developer roles are `senior-frontend`, `senior-backend`, and `senior-fullstack`.
 - Keep changes minimal and consistent with the framework structure under `_kratos/`.
@@ -32,5 +31,4 @@ This repository contains KRATOS, a fork of the original GAIA framework.
 ## Documentation updates
 
 - README must mention GitHub Copilot support.
-- README must state that KRATOS was forked from GAIA.
-- Avoid reintroducing stack-specific developer tables or `/gaia-*` command examples.
+- Avoid reintroducing stack-specific developer tables.

@@ -679,7 +679,7 @@ providers:
 
 **What we're building:** A Validator agent (Val) that verifies factual claims in generated artifacts against filesystem reality and a ground-truth cache. Val can run at template-output checkpoints, post-story, and on-demand.
 
-**Inspired by:** Gaia's Val agent with ground-truth verification.
+**Inspired by:** Kratos's Val agent with ground-truth verification.
 
 ### Architecture
 
